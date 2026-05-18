@@ -60,9 +60,18 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
     
-    /* Hide Streamlit's Default Standalone Native Sidebar Toggle Buttons to avoid glitch duplicate arrows */
+    /* Hide Streamlit's Default Standalone Native Sidebar Toggle Buttons to avoid duplicate layout clutter */
     button[data-testid="sidebar-toggle-button"] {
         display: none !important;
+    }
+
+    /* CRITICAL FIX: Eliminate keyboard hint utility text labels completely from rendering anywhere */
+    span[data-testid="stWidgetHint"], .stButton data-shortcut, span:has(text), button p span {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0px !important;
+        height: 0px !important;
     }
     
     /* Main Streamlit Core Overrides */
@@ -81,13 +90,22 @@ st.markdown("""
         padding: 8px 12px !important;
     }
     
-    /* Premium Sidebar UI Architecture with Custom Collapse Animation Smooth Bounds */
+    /* PERMANENT REMOVAL OF SCROLLBARS FROM SIDEBAR */
     section[data-testid="stSidebar"] {
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
-        padding: 20px 16px !important;
+        padding: 16px 16px !important;
+        overflow: hidden !important;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
     }
     
+    section[data-testid="stSidebar"] div, section[data-testid="stSidebar"] .stBlock {
+        overflow: hidden !important;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+    }
+
     /* Custom Sidebar Radio Element Styling Hack */
     div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label {
         background-color: #111827 !important;
@@ -202,20 +220,22 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
     }
     
-    /* Custom Specific Positioning Overrides for Control Arrow Blocks */
+    /* Refined Custom Compact Sizing for Upper Structural Toggle Arrows */
     .custom-collapse-wrapper button {
         background: #111827 !important;
         border: 1px solid #1E293B !important;
         color: #38BDF8 !important;
-        font-size: 16px !important;
-        padding: 6px 12px !important;
+        font-size: 15px !important;
+        padding: 4px 10px !important;
         border-radius: 6px !important;
+        min-width: 32px !important;
+        height: 32px !important;
     }
     
-    /* Sidebar Absolute Lower Spacing Controls for Clean Corner Clearances */
+    /* Sidebar Lower Spacing Grid Configuration to clear absolute boundary lines */
     .sidebar-bottom-panel-padded {
-        padding: 20px 12px 25px 12px !important;
-        margin-top: 40px;
+        padding: 15px 12px 20px 12px !important;
+        margin-top: 35px;
     }
 
     div[data-testid="stDataFrame"] {
@@ -304,7 +324,6 @@ if not st.session_state.logged_in:
 
 # ================= SIDEBAR RENDER ARCHITECTURE =================
 if st.session_state.sidebar_collapsed:
-    # Inject pure CSS to shrink the sidebar panel down safely
     st.markdown("""
         <style>
             section[data-testid="stSidebar"] {
@@ -318,24 +337,24 @@ if st.session_state.sidebar_collapsed:
         </style>
     """, unsafe_allow_html=True)
 else:
-    # Render interior controls inside active open sidebar
-    side_head_left, side_head_right = st.sidebar.columns([3.5, 1.2])
+    # Top Row Layout for Title Heading & Custom Close Button Alignment
+    side_head_left, side_head_right = st.sidebar.columns([3.8, 1.2])
     with side_head_left:
         st.markdown("""
-        <div style='padding-top: 4px;'>
-            <div style='color: #FFFFFF; font-weight: 800; font-size:23px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
+        <div style='padding-top: 2px;'>
+            <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
             <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
         </div>
         """, unsafe_allow_html=True)
         
     with side_head_right:
-        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 8px; text-align: right;'>", unsafe_allow_html=True)
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 4px; text-align: right;'>", unsafe_allow_html=True)
         if st.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
             st.session_state.sidebar_collapsed = True
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 12px; margin-bottom:18px;'>", unsafe_allow_html=True)
+    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 10px; margin-bottom:15px;'>", unsafe_allow_html=True)
 
     menu = st.sidebar.radio(
         "NAVIGATION NODE",
@@ -343,16 +362,16 @@ else:
         label_visibility="collapsed"
     )
 
-    # Protected Session management button with clean distance bounds from lower corners
+    # Lower Container Space With Protected Distance From Corner Lines
     st.sidebar.markdown("<div class='sidebar-bottom-panel-padded'>", unsafe_allow_html=True)
-    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-bottom: 20px;'>", unsafe_allow_html=True)
+    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-bottom: 16px;'>", unsafe_allow_html=True)
     if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
         st.session_state.logged_in = False
         st.session_state.auth_screen = "login"
         st.rerun()
     st.sidebar.markdown("</div>", unsafe_allow_html=True)
 
-# Assign default view mapping fallback mode if sidebar is completely hidden
+# Navigation fallbacks
 if st.session_state.sidebar_collapsed:
     if "current_menu_node" not in st.session_state:
         st.session_state.current_menu_node = "Dashboard Overview"
@@ -361,27 +380,26 @@ else:
     st.session_state.current_menu_node = menu
 
 # ================= CORE VIEW CONTENT REGISTRATION =================
-# Wrapper layout for application header row containing the toggle expand button `»`
+# Premium Alignments for Expand Button Bar Node Mapping
 layout_header_left, layout_header_right = st.columns([0.4, 11.6])
 
 with layout_header_left:
     if st.session_state.sidebar_collapsed:
-        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 10px;'>", unsafe_allow_html=True)
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 6px;'>", unsafe_allow_html=True)
         if st.button("»", key="trigger_sidebar_expand", help="Show Side Menu Options"):
             st.session_state.sidebar_collapsed = False
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
     else:
-        st.write("") # Keep blank spacing grid to preserve visual symmetry when bar is active
+        st.write("")
 
 with layout_header_right:
     if menu == "Dashboard Overview":
         st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
         st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
 
-# Ensure view nodes can continue smoothly below the structural tracking bar
+# View router execution path layers
 if menu == "Dashboard Overview":
-    # Calculate Data Structures
     total = len(st.session_state.patients)
     positive = len([p for p in st.session_state.patients if p.get("Stage") == "Diabetes Mellitus"])
     risk = len([p for p in st.session_state.patients if p.get("Stage") == "Prediabetes"])
