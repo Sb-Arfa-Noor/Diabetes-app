@@ -65,19 +65,9 @@ st.markdown("""
         display: none !important;
     }
 
-    /* CRITICAL FIX: Absolute destruction of all keyboard hints, shortcuts, and native button helper texts */
-    span[data-testid="stWidgetHint"], 
-    .stButton data-shortcut, 
-    button p span,
-    button[data-testid="baseButton-secondary"] span,
-    div[data-testid="stWidgetLabel"] + div p,
-    small, .kbd, kbd, [data-testid="stHelpInstruction"] {
+    /* FIXED: Removed the aggressive text hiding rules that were breaking button texts */
+    span[data-testid="stWidgetHint"] {
         display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        width: 0px !important;
-        height: 0px !important;
-        position: absolute !important;
     }
     
     /* Main Streamlit Core Overrides */
@@ -101,18 +91,8 @@ st.markdown("""
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
         padding: 10px 14px !important;
-        overflow: hidden !important;
     }
     
-    section[data-testid="stSidebar"] div, 
-    section[data-testid="stSidebar"] div[data-testid="stSidebarUserContent"],
-    section[data-testid="stSidebar"] .stBlock,
-    section[data-testid="stSidebar"] [role="radiogroup"] {
-        overflow: hidden !important;
-        overflow-x: hidden !important;
-        overflow-y: hidden !important;
-    }
-
     /* Custom Sidebar Radio Element Styling Hack */
     div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label {
         background-color: #111827 !important;
@@ -154,6 +134,7 @@ st.markdown("""
         color: #F8FAFC !important;
         letter-spacing: -0.75px;
         margin-bottom: 4px;
+        margin-top: 10px;
     }
     .sub-title-view {
         font-size: 14px;
@@ -227,44 +208,16 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
     }
     
-    /* PERFECT FIX: FIXED POSITIONING FOR COLLAPSE ARROWS (Targeted Alignment) */
-    .custom-collapse-wrapper {
-        position: absolute;
-        right: 16px;
-        top: 14px;
-        z-index: 99999;
-    }
+    /* FIXED: Adjusted collapse wrapper sizing to keep text visible and well proportioned */
     .custom-collapse-wrapper button {
         background: #111827 !important;
         border: 1px solid #1E293B !important;
         color: #38BDF8 !important;
         font-size: 16px !important;
-        padding: 0px !important;
+        font-weight: bold !important;
         border-radius: 6px !important;
-        min-width: 38px !important;
-        width: 38px !important;
-        height: 38px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    .custom-expand-wrapper {
-        display: inline-block;
-        margin-right: 15px;
-        vertical-align: middle;
-        margin-bottom: 12px;
-    }
-    .custom-expand-wrapper button {
-        background: #111827 !important;
-        border: 1px solid #1E293B !important;
-        color: #38BDF8 !important;
-        font-size: 16px !important;
-        padding: 0px !important;
-        border-radius: 6px !important;
-        min-width: 38px !important;
-        width: 38px !important;
-        height: 38px !important;
+        width: 42px !important;
+        height: 42px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -375,22 +328,24 @@ if st.session_state.sidebar_collapsed:
         </style>
     """, unsafe_allow_html=True)
 else:
-    # UPPER TITLE HEADER DIRECT INJECTION (No raw helper strings or alignment breaking columns)
-    st.sidebar.markdown("""
-    <div style='padding-top: 2px; position: relative; margin-bottom: 10px;'>
-        <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
-        <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Absolute Placement Context for the Collapse Arrow
-    st.sidebar.markdown("<div class='custom-collapse-wrapper'>", unsafe_allow_html=True)
-    if st.sidebar.button("«", key="trigger_sidebar_collapse"):
-        st.session_state.sidebar_collapsed = True
-        st.rerun()
-    st.sidebar.markdown("</div>", unsafe_allow_html=True)
+    # FIXED: Reordered layout to place the control button elegantly beside the title text
+    side_head_left, side_head_right = st.sidebar.columns([3.5, 1.5])
+    with side_head_left:
+        st.markdown("""
+        <div style='padding-top: 2px;'>
+            <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
+            <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with side_head_right:
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 4px; display: flex; justify-content: flex-end;'>", unsafe_allow_html=True)
+        if st.sidebar.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
+            st.session_state.sidebar_collapsed = True
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 5px; margin-bottom:15px;'>", unsafe_allow_html=True)
+    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 15px; margin-bottom:15px;'>", unsafe_allow_html=True)
 
     menu = st.sidebar.radio(
         "NAVIGATION NODE",
@@ -398,7 +353,7 @@ else:
         label_visibility="collapsed"
     )
 
-    # Lower Container Space With Protected Distance
+    # Lower Container Space
     st.sidebar.markdown("<div class='sidebar-bottom-panel-padded'>", unsafe_allow_html=True)
     st.sidebar.markdown("<hr style='border-color: #1E293B; margin-bottom: 16px;'>", unsafe_allow_html=True)
     if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
@@ -416,17 +371,23 @@ else:
     st.session_state.current_menu_node = menu
 
 # ================= CORE VIEW CONTENT REGISTRATION =================
-# INLINE BLOCK PLACEMENT (Ensures layout alignment matches exactly as requested)
-if st.session_state.sidebar_collapsed:
-    st.markdown("<div class='custom-expand-wrapper'>", unsafe_allow_html=True)
-    if st.button("»", key="trigger_sidebar_expand"):
-        st.session_state.sidebar_collapsed = False
-        st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
+# FIXED POSITION: Restructured header column configuration to completely prevent text blocking
+layout_header_left, layout_header_right = st.columns([0.6, 11.4])
 
-if menu == "Dashboard Overview":
-    st.markdown('<div style="display: inline-block; vertical-align: top;"><div class="main-title-view" style="margin-top:-5px;">System Executive Dashboard</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
+with layout_header_left:
+    if st.session_state.sidebar_collapsed:
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 12px;'>", unsafe_allow_html=True)
+        if st.button("»", key="trigger_sidebar_expand", help="Show Side Menu Options"):
+            st.session_state.sidebar_collapsed = False
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.write("")
+
+with layout_header_right:
+    if menu == "Dashboard Overview":
+        st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
 
 # View router execution path layers
 if menu == "Dashboard Overview":
@@ -495,8 +456,9 @@ elif menu == "Diagnostic Pipeline":
     if "step" not in st.session_state:
         st.session_state.step = 1
     
-    st.markdown('<div class="main-title-view">AI Inference Architecture</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="sub-title-view">Multi-stage analytics system pipeline — <b>Active Phase Frame {st.session_state.step} of 3</b></div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">AI Inference Architecture</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sub-title-view">Multi-stage analytics system pipeline — <b>Active Phase Frame {st.session_state.step} of 3</b></div>', unsafe_allow_html=True)
     
     if st.session_state.step == 1:
         st.markdown("<div class='panel-card-container'><h4 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Phase 1: Entry Demographics & Direct Laboratory Glycemic Markers</h4><br>", unsafe_allow_html=True)
@@ -605,8 +567,9 @@ elif menu == "Diagnostic Pipeline":
 
 # ================= MODULE 3: PATIENTS MATRIX REGISTRY =================
 elif menu == "Patients Matrix Registry":
-    st.markdown('<div class="main-title-view">Electronic Health Ledger Database</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Registry control layers and transactional data table frames</div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">Electronic Health Ledger Database</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Registry control layers and transactional data table frames</div>', unsafe_allow_html=True)
     
     if st.session_state.patients:
         df = pd.DataFrame(st.session_state.patients).fillna("N/A")
@@ -635,8 +598,9 @@ elif menu == "Patients Matrix Registry":
 
 # ================= MODULE 4: DATA REPORT CENTER =================
 elif menu == "Data Report Center":
-    st.markdown('<div class="main-title-view">Documentation Export Matrices</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Download formal plain-text electronic verification logs</div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">Documentation Export Matrices</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Download formal plain-text electronic verification logs</div>', unsafe_allow_html=True)
     
     if st.session_state.patients:
         df_rep = pd.DataFrame(st.session_state.patients).fillna("N/A")
@@ -656,8 +620,9 @@ elif menu == "Data Report Center":
 
 # ================= MODULE 5: VISUAL ANALYTICS NODE =================
 elif menu == "Visual Analytics Node":
-    st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
 
     if not st.session_state.patients:
         mock_data = [
@@ -772,8 +737,9 @@ elif menu == "Visual Analytics Node":
 
 # ================= MODULE 6: CONSULTATION MATRIX =================
 elif menu == "Consultation Matrix":
-    st.markdown('<div class="main-title-view">Clinical Allocation Matrix Grid</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Time logs tracking operational consultation scheduling blocks</div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">Clinical Allocation Matrix Grid</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Time logs tracking operational consultation scheduling blocks</div>', unsafe_allow_html=True)
     
     sche_df = pd.DataFrame({
         "Patient Identity Mapping String": ["John Doe", "Sarah Khan", "Ali Raza"],
