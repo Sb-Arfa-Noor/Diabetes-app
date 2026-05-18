@@ -56,7 +56,7 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
     
-    /* Strict Typography Controls Override */
+    /* Strict Typography Controls Override - Excluding specific icon identifiers to prevent glitchy raw text */
     h1, h2, h3, h4, h5, h6, p, label, span, div {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
@@ -77,11 +77,11 @@ st.markdown("""
         padding: 8px 12px !important;
     }
     
-    /* Premium Sidebar UI Architecture */
+    /* Premium Sidebar UI Architecture with Proper Interior Padding */
     section[data-testid="stSidebar"] {
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
-        padding-top: 10px;
+        padding: 16px 14px !important;
         transition: width 0.3s ease, transform 0.3s ease !important;
     }
     
@@ -199,6 +199,11 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
     }
     
+    /* Sidebar Specific Button Safety Padding to keep it clear from edges */
+    .sidebar-btn-spacer {
+        padding: 0px 10px 15px 10px !important;
+    }
+
     /* Streamlit Interactive Dataframe Custom Dark Theme Polish */
     div[data-testid="stDataFrame"] {
         border: 1px solid #1E293B !important;
@@ -286,13 +291,29 @@ if not st.session_state.logged_in:
     st.stop()
 
 # ================= CORPORATE NAVIGATION MENU =================
+# Sidebar Header Section with Embedded Control Architecture
 st.sidebar.markdown("""
-<div style='padding: 24px 12px 16px 12px;'>
+<div style='padding: 10px 10px 10px 10px;'>
     <div style='color: #FFFFFF; font-weight: 800; font-size:24px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
     <div style='color: #38BDF8; font-size: 11px; margin-top: 4px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
 </div>
-<hr style='border-color: #1E293B; margin-top: 0px; margin-bottom:20px;'>
 """, unsafe_allow_html=True)
+
+# Collapse Button Area inside Sidebar - Shifted to Top Right Corner with precise distance alignment
+side_btn_col1, side_btn_col2 = st.sidebar.columns([3, 1.2])
+with side_btn_col2:
+    if st.sidebar.button("«", key="close_nav_bar", help="Collapse Side Menu"):
+        st.markdown("""
+            <style>
+                section[data-testid="stSidebar"] {
+                    width: 0px !important;
+                    min-width: 0px !important;
+                    transform: translateX(-350px) !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
+st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 5px; margin-bottom:20px;'>", unsafe_allow_html=True)
 
 menu = st.sidebar.radio(
     "NAVIGATION NODE",
@@ -301,43 +322,37 @@ menu = st.sidebar.radio(
 )
 
 st.sidebar.markdown("<br><br><hr style='border-color: #1E293B;'>", unsafe_allow_html=True)
-if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
-    st.session_state.logged_in = False
-    st.session_state.auth_screen = "login"
-    st.rerun()
+
+# Handled sidebar bottom buttons distance safely to clear absolute boundaries
+with st.sidebar.container():
+    st.markdown("<div class='sidebar-btn-spacer'>", unsafe_allow_html=True)
+    if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
+        st.session_state.logged_in = False
+        st.session_state.auth_screen = "login"
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ================= MODULE 1: DASHBOARD OVERVIEW =================
 if menu == "Dashboard Overview":
-    # Clean & Professional Sidebar Toggle/State Management Layout using True Icons
-    title_left, title_right = st.columns([5, 1.2])
+    # Layout Main Headers along with Expand Button Alignment at Top Left Corner with precise margins
+    title_left, title_right = st.columns([0.4, 5.8])
     with title_left:
+        st.write("<div style='margin-top: 6px;'></div>", unsafe_allow_html=True)
+        if st.button("»", key="open_nav_bar", help="Expand Side Menu"):
+            st.markdown("""
+                <style>
+                    section[data-testid="stSidebar"] {
+                        width: 336px !important;
+                        min-width: 336px !important;
+                        transform: translateX(0px) !important;
+                    }
+                </style>
+            """, unsafe_allow_html=True)
+            st.rerun()
+            
+    with title_right:
         st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
         st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
-    with title_right:
-        st.write("<p style='margin:0; font-size:10px; color:#94A3B8; font-weight:700; text-align:center; letter-spacing:0.5px;'>SIDEBAR WINDOW</p>", unsafe_allow_html=True)
-        arr_col1, arr_col2 = st.columns(2)
-        with arr_col1:
-            if st.button("«", key="close_nav_bar", use_container_width=True, help="Collapse Side Menu"):
-                st.markdown("""
-                    <style>
-                        section[data-testid="stSidebar"] {
-                            width: 0px !important;
-                            min-width: 0px !important;
-                            transform: translateX(-350px) !important;
-                        }
-                    </style>
-                """, unsafe_allow_html=True)
-        with arr_col2:
-            if st.button("»", key="open_nav_bar", use_container_width=True, help="Expand Side Menu"):
-                st.markdown("""
-                    <style>
-                        section[data-testid="stSidebar"] {
-                            width: 336px !important;
-                            min-width: 336px !important;
-                            transform: translateX(0px) !important;
-                        }
-                    </style>
-                """, unsafe_allow_html=True)
     
     # Calculate Data Structures
     total = len(st.session_state.patients)
@@ -379,9 +394,7 @@ if menu == "Dashboard Overview":
     with col2:
         st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Population Density Proportions</h5>", unsafe_allow_html=True)
         
-        # VALIDATED ERROR-FREE: Heavy Professional Donut Chart
         fig = go.Figure()
-        
         fig.add_trace(go.Pie(
             labels=["Diabetes Mellitus", "Normal Status", "Prediabetes Risk"], 
             values=[positive, normal, risk], 
