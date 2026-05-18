@@ -48,7 +48,7 @@ if "sidebar_state" not in st.session_state:
 # ================= PREMIUM EXECUTIVE DARK BLUE CSS STYLING =================
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
     
     /* Core Application Framework Theme */
     .stApp {
@@ -82,6 +82,7 @@ st.markdown("""
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
         padding-top: 10px;
+        transition: width 0.3s ease, transform 0.3s ease !important;
     }
     
     /* Custom Sidebar Radio Element Styling Hack */
@@ -307,20 +308,36 @@ if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
 
 # ================= MODULE 1: DASHBOARD OVERVIEW =================
 if menu == "Dashboard Overview":
-    # Functional Arrow Buttons to Collapse/Expand Sidebar Menu Controls
-    title_left, title_right = st.columns([5, 0.6])
+    # Clean & Professional Sidebar Toggle/State Management Layout using True Icons
+    title_left, title_right = st.columns([5, 1.2])
     with title_left:
         st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
         st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
     with title_right:
-        st.write("<p style='margin:0; font-size:10px; color:#94A3B8; font-weight:700; text-align:right; letter-spacing:0.5px;'>SIDEBAR</p>", unsafe_allow_html=True)
+        st.write("<p style='margin:0; font-size:10px; color:#94A3B8; font-weight:700; text-align:center; letter-spacing:0.5px;'>SIDEBAR WINDOW</p>", unsafe_allow_html=True)
         arr_col1, arr_col2 = st.columns(2)
         with arr_col1:
-            if st.button("«", key="close_nav_bar", use_container_width=True, help="Minimize View"):
-                st.markdown("""<style>section[data-testid="stSidebar"] {display: none !important;}</style>""", unsafe_allow_html=True)
+            if st.button("«", key="close_nav_bar", use_container_width=True, help="Collapse Side Menu"):
+                st.markdown("""
+                    <style>
+                        section[data-testid="stSidebar"] {
+                            width: 0px !important;
+                            min-width: 0px !important;
+                            transform: translateX(-350px) !important;
+                        }
+                    </style>
+                """, unsafe_allow_html=True)
         with arr_col2:
-            if st.button("»", key="open_nav_bar", use_container_width=True, help="Expand View"):
-                st.markdown("""<style>section[data-testid="stSidebar"] {display: block !important;}</style>""", unsafe_allow_html=True)
+            if st.button("»", key="open_nav_bar", use_container_width=True, help="Expand Side Menu"):
+                st.markdown("""
+                    <style>
+                        section[data-testid="stSidebar"] {
+                            width: 336px !important;
+                            min-width: 336px !important;
+                            transform: translateX(0px) !important;
+                        }
+                    </style>
+                """, unsafe_allow_html=True)
     
     # Calculate Data Structures
     total = len(st.session_state.patients)
@@ -328,7 +345,7 @@ if menu == "Dashboard Overview":
     risk = len([p for p in st.session_state.patients if p.get("Stage") == "Prediabetes"])
     normal = total - positive - risk
     
-    # Fallback Data Allocation
+    # Fallback Data Allocation agar data empty ho
     if total == 0:
         total, positive, risk, normal = 124, 52, 38, 34
     
@@ -351,7 +368,6 @@ if menu == "Dashboard Overview":
                 hide_index=True
             )
         else:
-            # Fallback Table Data Structure
             mock_table = pd.DataFrame([
                 {"ID": "P102", "Name": "Ayesha Malik", "Age": 45, "Gender": "Female", "Stage": "Diabetes Mellitus"},
                 {"ID": "P103", "Name": "Zain Ahmed", "Age": 38, "Gender": "Male", "Stage": "Prediabetes"},
@@ -363,39 +379,24 @@ if menu == "Dashboard Overview":
     with col2:
         st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Population Density Proportions</h5>", unsafe_allow_html=True)
         
-        # High Level Premium Nested Multi-Ring Pie/Donut Chart Simulation
+        # VALIDATED ERROR-FREE: Heavy Professional Donut Chart
         fig = go.Figure()
         
-        # Outer Slices Displaying Precise Metadata Values
         fig.add_trace(go.Pie(
             labels=["Diabetes Mellitus", "Normal Status", "Prediabetes Risk"], 
             values=[positive, normal, risk], 
-            hole=.65, 
+            hole=0.65, 
             marker=dict(
                 colors=['#F43F5E', '#10B981', '#F59E0B'],
-                line=dict(color='#111C44', width=3)
+                line=dict(color='#111C44', width=2)
             ),
             textinfo='percent+label',
-            hoverinfo='label+value+percent',
-            font=dict(size=12, color="#FFFFFF"),
-            domain=dict(x=[0, 1], y=[0, 1])
-        ))
-        
-        # Inner Core Target Indicator Layer matching Image 3 structure
-        fig.add_trace(go.Pie(
-            labels=["Active Core Cases"],
-            values=[total],
-            hole=0.52,
-            marker=dict(colors=['#1E293B']),
-            textinfo='none',
-            hoverinfo='none',
-            showlegend=False,
-            domain=dict(x=[0.1, 0.9], y=[0.1, 0.9])
+            hoverinfo='label+value+percent'
         ))
         
         fig.update_layout(
             height=310, 
-            margin=dict(l=10, r=10, t=10, b=10), 
+            margin=dict(l=15, r=15, t=10, b=10), 
             showlegend=False, 
             paper_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Plus Jakarta Sans", color="#FFFFFF")
@@ -584,7 +585,6 @@ elif menu == "Visual Analytics Node":
                 st.session_state.layout_invert = True
                 st.rerun()
 
-    # Base Mock Datasets for Detailed Visualizations mapping to Image 3
     if not st.session_state.patients:
         mock_data = [
             {"Age": 34, "FBS": 100.5, "Stage": "Prediabetes", "Gender": "Male"},
@@ -648,17 +648,7 @@ elif menu == "Visual Analytics Node":
                 values=[m_total, f_total],
                 hole=0.70,
                 marker=dict(colors=['#0284C7', '#E11D48']),
-                textinfo='label+percent',
-                domain=dict(x=[0, 1], y=[0, 1])
-            ))
-            fig2.add_trace(go.Pie(
-                labels=["Normal Base", "Risk Stratified"],
-                values=[int(len(df)*0.4), int(len(df)*0.6)],
-                hole=0.55,
-                marker=dict(colors=['#10B981', '#F59E0B']),
-                textinfo='none',
-                domain=dict(x=[0.15, 0.85], y=[0.15, 0.85]),
-                showlegend=False
+                textinfo='label+percent'
             ))
             
             fig2.update_layout(
