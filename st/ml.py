@@ -45,7 +45,7 @@ if "patient_data" not in st.session_state:
 if "sidebar_collapsed" not in st.session_state:
     st.session_state.sidebar_collapsed = False
 
-# ================= PREMIUM EXECUTIVE DARK BLUE CSS STYLING =================
+# ================= PREMIUM EXECUTIVE ULTRA CLEAN CSS STYLING =================
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
@@ -60,13 +60,17 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
     
-    /* Hide Streamlit's Default Standalone Native Sidebar Toggle Buttons to avoid duplicate layout clutter */
+    /* Hide Streamlit's Native Built-in Sidebar Buttons completely */
     button[data-testid="sidebar-toggle-button"] {
         display: none !important;
     }
 
-    /* CRITICAL FIX: Eliminate keyboard hint utility text labels completely from rendering anywhere */
-    span[data-testid="stWidgetHint"], .stButton data-shortcut, span:has(text), button p span {
+    /* CRITICAL FIX: Eliminate keyboard hints, shortcut utility strings and raw labels under buttons completely */
+    span[data-testid="stWidgetHint"], 
+    .stButton data-shortcut, 
+    button p span,
+    button[data-testid="baseButton-secondary"] span,
+    div[data-testid="stWidgetLabel"] + div p {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -90,17 +94,18 @@ st.markdown("""
         padding: 8px 12px !important;
     }
     
-    /* PERMANENT REMOVAL OF SCROLLBARS FROM SIDEBAR */
+    /* ABSOLUTE REMOVAL OF SCROLLBARS FROM THE SIDE MENU CONTAINER */
     section[data-testid="stSidebar"] {
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
-        padding: 16px 16px !important;
+        padding: 10px 14px !important;
         overflow: hidden !important;
-        overflow-x: hidden !important;
-        overflow-y: hidden !important;
     }
     
-    section[data-testid="stSidebar"] div, section[data-testid="stSidebar"] .stBlock {
+    section[data-testid="stSidebar"] div, 
+    section[data-testid="stSidebar"] div[data-testid="stSidebarUserContent"],
+    section[data-testid="stSidebar"] .stBlock,
+    section[data-testid="stSidebar"] [role="radiogroup"] {
         overflow: hidden !important;
         overflow-x: hidden !important;
         overflow-y: hidden !important;
@@ -220,22 +225,26 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
     }
     
-    /* Refined Custom Compact Sizing for Upper Structural Toggle Arrows */
+    /* PRECISE ALIGNMENT FOR THE EXPAND / COLLAPSE CUSTOM ARROWS AS PER IMAGE */
     .custom-collapse-wrapper button {
         background: #111827 !important;
         border: 1px solid #1E293B !important;
         color: #38BDF8 !important;
-        font-size: 15px !important;
-        padding: 4px 10px !important;
+        font-size: 16px !important;
+        padding: 0px !important;
         border-radius: 6px !important;
-        min-width: 32px !important;
-        height: 32px !important;
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
     
     /* Sidebar Lower Spacing Grid Configuration to clear absolute boundary lines */
     .sidebar-bottom-panel-padded {
-        padding: 15px 12px 20px 12px !important;
-        margin-top: 35px;
+        padding: 10px 12px 15px 12px !important;
+        margin-top: 25px;
     }
 
     div[data-testid="stDataFrame"] {
@@ -337,8 +346,8 @@ if st.session_state.sidebar_collapsed:
         </style>
     """, unsafe_allow_html=True)
 else:
-    # Top Row Layout for Title Heading & Custom Close Button Alignment
-    side_head_left, side_head_right = st.sidebar.columns([3.8, 1.2])
+    # UPPER TITLE HEADER ROW LAYOUT FOR EXACT CORNER CLOSE POSITION
+    side_head_left, side_head_right = st.sidebar.columns([4.0, 1.0])
     with side_head_left:
         st.markdown("""
         <div style='padding-top: 2px;'>
@@ -380,7 +389,7 @@ else:
     st.session_state.current_menu_node = menu
 
 # ================= CORE VIEW CONTENT REGISTRATION =================
-# Premium Alignments for Expand Button Bar Node Mapping
+# FIXED POSITION: Header matching top native structure level exactly
 layout_header_left, layout_header_right = st.columns([0.4, 11.6])
 
 with layout_header_left:
