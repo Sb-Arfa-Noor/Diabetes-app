@@ -96,7 +96,7 @@ st.markdown("""
     section[data-testid="stSidebar"] {
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
-        padding: 10px 14px !important;
+        padding: 15px 14px !important;
         overflow: hidden !important;
     }
     
@@ -110,6 +110,10 @@ st.markdown("""
     }
 
     /* Custom Sidebar Radio Element Styling Hack */
+    div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] {
+        margin-top: 20px !important;
+    }
+    
     div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label {
         background-color: #111827 !important;
         border: 1px solid #1F2937 !important;
@@ -136,7 +140,7 @@ st.markdown("""
     /* Clean Premium Layout Cards */
     .panel-card-container {
         background: #111C44;
-        padding: 28px;
+        padding: 24px;
         border-radius: 12px;
         border: 1px solid #1E293B;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
@@ -238,7 +242,7 @@ st.markdown("""
     /* Sidebar Lower Spacing Grid Configuration */
     .sidebar-bottom-panel-padded {
         padding: 10px 12px 15px 12px !important;
-        margin-top: 25px;
+        margin-top: 35px;
     }
 
     div[data-testid="stDataFrame"] {
@@ -337,31 +341,31 @@ if st.session_state.sidebar_collapsed:
         </style>
     """, unsafe_allow_html=True)
 else:
-    # 75/25 split layout ensuring ample room for title text without line wrap breaks
-    side_head_left, side_head_right = st.sidebar.columns([3.0, 1.0])
-    with side_head_left:
-        st.markdown("""
-        <div style='padding-top: 2px; white-space: nowrap;'>
-            <div style='color: #FFFFFF; font-weight: 800; font-size:20px; letter-spacing:-0.5px;'>DiabetesCare AI</div>
-            <div style='color: #38BDF8; font-size: 10px; margin-top: 1px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-    with side_head_right:
-        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 2px; display: flex; justify-content: flex-end;'>", unsafe_allow_html=True)
-        if st.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
-            st.session_state.sidebar_collapsed = True
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
+    # 1. Sabse upar custom side menu button
+    st.sidebar.markdown("<div class='custom-collapse-wrapper' style='padding-top: 5px; display: flex; justify-content: flex-start;'>", unsafe_allow_html=True)
+    if st.sidebar.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
+        st.session_state.sidebar_collapsed = True
+        st.rerun()
+    st.sidebar.markdown("</div>", unsafe_allow_html=True)
 
-    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 15px; margin-bottom:15px;'>", unsafe_allow_html=True)
+    # 2. Phr heading aur heading ke neeche wali line
+    st.sidebar.markdown("""
+    <div style='padding-top: 15px; padding-left: 2px; white-space: nowrap;'>
+        <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.5px;'>DiabetesCare AI</div>
+        <div style='color: #38BDF8; font-size: 10px; margin-top: 3px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
+    </div>
+    """, unsafe_allow_html=True)
 
+    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 15px; margin-bottom:5px;'>", unsafe_allow_html=True)
+
+    # 3. Phr saare navigation menu options thode gap ke sath
     menu = st.sidebar.radio(
         "NAVIGATION NODE",
         ["Dashboard Overview", "Patients Matrix Registry", "Diagnostic Pipeline", "Data Report Center", "Visual Analytics Node", "Consultation Matrix"],
         label_visibility="collapsed"
     )
 
+    # 4. End mein terminate wala button proper spacing pe
     st.sidebar.markdown("<div class='sidebar-bottom-panel-padded'>", unsafe_allow_html=True)
     st.sidebar.markdown("<hr style='border-color: #1E293B; margin-bottom: 16px;'>", unsafe_allow_html=True)
     if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
@@ -414,8 +418,8 @@ if menu == "Dashboard Overview":
         
     st.write("<br>", unsafe_allow_html=True)
     
-    # 55/45 split giving the pie chart proper padding context to display beautifully
-    col1, col2 = st.columns([1.3, 1.1])
+    # Grid ratio tweaked to give the Pie Chart ample space without breaking or cutting off
+    col1, col2 = st.columns([1.2, 1.2])
     
     with col1:
         st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Recent Integrated Case Records</h5>", unsafe_allow_html=True)
@@ -436,30 +440,30 @@ if menu == "Dashboard Overview":
             st.dataframe(mock_table, use_container_width=True, hide_index=True)
             
     with col2:
-        st.markdown("<div class='panel-card-container' style='padding: 20px; min-height: 380px;'>", unsafe_allow_html=True)
-        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:5px; font-weight:700; font-size:15px;'>Population Density Proportions</h5>", unsafe_allow_html=True)
+        st.markdown("<div class='panel-card-container' style='min-height: 380px;'>", unsafe_allow_html=True)
+        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700; font-size:15px;'>Population Density Proportions</h5>", unsafe_allow_html=True)
         
         fig = go.Figure()
         fig.add_trace(go.Pie(
             labels=["Diabetes Mellitus", "Normal Status", "Prediabetes Risk"], 
             values=[positive, normal, risk], 
-            hole=0.60, 
+            hole=0.55, 
             marker=dict(
                 colors=['#F43F5E', '#10B981', '#F59E0B'],
-                line=dict(color='#111C44', width=3)
+                line=dict(color='#111C44', width=2)
             ),
             textinfo='percent',
             hoverinfo='label+value+percent'
         ))
         
         fig.update_layout(
-            height=280, 
-            margin=dict(l=10, r=10, t=10, b=10), 
+            height=260, 
+            margin=dict(l=20, r=20, t=10, b=10), 
             showlegend=True, 
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
-                y=-0.2,
+                y=-0.3,
                 xanchor="center",
                 x=0.5,
                 font=dict(size=11, color="#94A3B8")
