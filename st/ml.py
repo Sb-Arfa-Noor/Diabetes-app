@@ -65,13 +65,12 @@ st.markdown("""
         display: none !important;
     }
 
-    /* CRITICAL FIX: Eliminate keyboard hints, shortcut strings and raw labels under buttons completely */
+    /* CRITICAL FIX: Eliminate keyboard hints, shortcut utility strings and raw labels under buttons completely */
     span[data-testid="stWidgetHint"], 
     .stButton data-shortcut, 
     button p span,
     button[data-testid="baseButton-secondary"] span,
-    div[data-testid="stWidgetLabel"] + div p,
-    button[data-testid="baseButton-secondary"] p {
+    div[data-testid="stWidgetLabel"] + div p {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -226,33 +225,17 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
     }
     
-    /* EXACT FIX: Absolute Position Placement For Custom Menu Toggle Arrows */
-    div.fixed-collapse-container {
-        position: fixed !important;
-        top: 10px !important;
-        left: 250px !important;
-        z-index: 999999 !important;
-    }
-    div.fixed-expand-container {
-        position: fixed !important;
-        top: 10px !important;
-        left: 15px !important;
-        z-index: 999999 !important;
-    }
-    
-    /* Raw Style overrides for custom arrow icons without text trace */
-    .fixed-collapse-container button, .fixed-expand-container button {
+    /* PRECISE ALIGNMENT FOR THE EXPAND / COLLAPSE CUSTOM ARROWS AS PER IMAGE */
+    .custom-collapse-wrapper button {
         background: #111827 !important;
         border: 1px solid #1E293B !important;
         color: #38BDF8 !important;
-        font-size: 18px !important;
-        font-weight: bold !important;
+        font-size: 16px !important;
         padding: 0px !important;
-        margin: 0px !important;
         border-radius: 6px !important;
-        width: 32px !important;
-        min-width: 32px !important;
-        height: 32px !important;
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -363,21 +346,24 @@ if st.session_state.sidebar_collapsed:
         </style>
     """, unsafe_allow_html=True)
 else:
-    # PLACING COLLAPSE ARROW ON EXACT THE POSITION ENCLOSED BY RED MARKS
-    st.markdown('<div class="fixed-collapse-container">', unsafe_allow_html=True)
-    if st.button("‹", key="trigger_sidebar_collapse"):
-        st.session_state.sidebar_collapsed = True
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+    # UPPER TITLE HEADER ROW LAYOUT FOR EXACT CORNER CLOSE POSITION
+    side_head_left, side_head_right = st.sidebar.columns([4.0, 1.0])
+    with side_head_left:
+        st.markdown("""
+        <div style='padding-top: 2px;'>
+            <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
+            <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with side_head_right:
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 4px; text-align: right;'>", unsafe_allow_html=True)
+        if st.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
+            st.session_state.sidebar_collapsed = True
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    st.sidebar.markdown("""
-    <div style='padding-top: 5px; margin-bottom: 10px;'>
-        <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
-        <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 5px; margin-bottom:15px;'>", unsafe_allow_html=True)
+    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 10px; margin-bottom:15px;'>", unsafe_allow_html=True)
 
     menu = st.sidebar.radio(
         "NAVIGATION NODE",
@@ -403,18 +389,23 @@ else:
     st.session_state.current_menu_node = menu
 
 # ================= CORE VIEW CONTENT REGISTRATION =================
-# PLACING EXPAND ARROW ON EXACT THE POSITION ENCLOSED BY RED ARROWS
-if st.session_state.sidebar_collapsed:
-    st.markdown('<div class="fixed-expand-container">', unsafe_allow_html=True)
-    if st.button("›", key="trigger_sidebar_expand"):
-        st.session_state.sidebar_collapsed = False
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+# FIXED POSITION: Header matching top native structure level exactly
+layout_header_left, layout_header_right = st.columns([0.4, 11.6])
 
-# Main Application Headers Layout
-if menu == "Dashboard Overview":
-    st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
+with layout_header_left:
+    if st.session_state.sidebar_collapsed:
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 6px;'>", unsafe_allow_html=True)
+        if st.button("»", key="trigger_sidebar_expand", help="Show Side Menu Options"):
+            st.session_state.sidebar_collapsed = False
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.write("")
+
+with layout_header_right:
+    if menu == "Dashboard Overview":
+        st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
 
 # View router execution path layers
 if menu == "Dashboard Overview":
@@ -483,8 +474,9 @@ elif menu == "Diagnostic Pipeline":
     if "step" not in st.session_state:
         st.session_state.step = 1
     
-    st.markdown('<div class="main-title-view">AI Inference Architecture</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="sub-title-view">Multi-stage analytics system pipeline — <b>Active Phase Frame {st.session_state.step} of 3</b></div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">AI Inference Architecture</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sub-title-view">Multi-stage analytics system pipeline — <b>Active Phase Frame {st.session_state.step} of 3</b></div>', unsafe_allow_html=True)
     
     if st.session_state.step == 1:
         st.markdown("<div class='panel-card-container'><h4 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Phase 1: Entry Demographics & Direct Laboratory Glycemic Markers</h4><br>", unsafe_allow_html=True)
@@ -593,8 +585,9 @@ elif menu == "Diagnostic Pipeline":
 
 # ================= MODULE 3: PATIENTS MATRIX REGISTRY =================
 elif menu == "Patients Matrix Registry":
-    st.markdown('<div class="main-title-view">Electronic Health Ledger Database</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Registry control layers and transactional data table frames</div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">Electronic Health Ledger Database</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Registry control layers and transactional data table frames</div>', unsafe_allow_html=True)
     
     if st.session_state.patients:
         df = pd.DataFrame(st.session_state.patients).fillna("N/A")
@@ -623,8 +616,9 @@ elif menu == "Patients Matrix Registry":
 
 # ================= MODULE 4: DATA REPORT CENTER =================
 elif menu == "Data Report Center":
-    st.markdown('<div class="main-title-view">Documentation Export Matrices</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Download formal plain-text electronic verification logs</div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">Documentation Export Matrices</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Download formal plain-text electronic verification logs</div>', unsafe_allow_html=True)
     
     if st.session_state.patients:
         df_rep = pd.DataFrame(st.session_state.patients).fillna("N/A")
@@ -644,8 +638,9 @@ elif menu == "Data Report Center":
 
 # ================= MODULE 5: VISUAL ANALYTICS NODE =================
 elif menu == "Visual Analytics Node":
-    st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
 
     if not st.session_state.patients:
         mock_data = [
@@ -760,8 +755,9 @@ elif menu == "Visual Analytics Node":
 
 # ================= MODULE 6: CONSULTATION MATRIX =================
 elif menu == "Consultation Matrix":
-    st.markdown('<div class="main-title-view">Clinical Allocation Matrix Grid</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Time logs tracking operational consultation scheduling blocks</div>', unsafe_allow_html=True)
+    with layout_header_right:
+        st.markdown('<div class="main-title-view">Clinical Allocation Matrix Grid</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Time logs tracking operational consultation scheduling blocks</div>', unsafe_allow_html=True)
     
     sche_df = pd.DataFrame({
         "Patient Identity Mapping String": ["John Doe", "Sarah Khan", "Ali Raza"],
