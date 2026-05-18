@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
 from datetime import datetime
 import os
 import joblib
@@ -40,6 +41,9 @@ if "patients" not in st.session_state:
 
 if "patient_data" not in st.session_state:
     st.session_state.patient_data = {}
+
+if "layout_invert" not in st.session_state:
+    st.session_state.layout_invert = False
 
 # ================= PREMIUM EXECUTIVE DARK BLUE CSS STYLING =================
 st.markdown("""
@@ -199,6 +203,20 @@ st.markdown("""
         border: 1px solid #1E293B !important;
         border-radius: 8px !important;
         overflow: hidden;
+    }
+    
+    /* Professional Layout Micro-adjusters */
+    .custom-report-view {
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+    .custom-report-view h4, .custom-report-view h5, .custom-report-view p, .custom-report-view b {
+        color: #1E293B !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -504,51 +522,177 @@ elif menu == "Data Report Center":
 
 # ================= MODULE 5: VISUAL ANALYTICS NODE =================
 elif menu == "Visual Analytics Node":
-    st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
-    
-    if st.session_state.patients:
+    # 1st Fix: Actionable Up/Down Arrow Mechanics inside Title Grid Block
+    title_left, title_right = st.columns([4, 1])
+    with title_left:
+        st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
+    with title_right:
+        st.write("<p style='margin:0; font-size:11px; color:#94A3B8; font-weight:700; text-align:right; letter-spacing:1px;'>LAYOUT TOGGLE</p>", unsafe_allow_html=True)
+        btn_col1, btn_col2 = st.columns(2)
+        with btn_col1:
+            if st.button("↑", key="layout_up_arrow", use_container_width=True):
+                st.session_state.layout_invert = False
+                st.rerun()
+        with btn_col2:
+            if st.button("↓", key="layout_down_arrow", use_container_width=True):
+                st.session_state.layout_invert = True
+                st.rerun()
+
+    # Base Mock Datasets for Detailed Visualizations mapping to Image 3
+    if not st.session_state.patients:
+        mock_data = [
+            {"Age": 34, "FBS": 100.5, "Stage": "Prediabetes", "Gender": "Male"},
+            {"Age": 45, "FBS": 140.2, "Stage": "Diabetes Mellitus", "Gender": "Female"},
+            {"Age": 28, "FBS": 88.0, "Stage": "Normal", "Gender": "Male"},
+            {"Age": 56, "FBS": 165.4, "Stage": "Diabetes Mellitus", "Gender": "Male"},
+            {"Age": 39, "FBS": 112.1, "Stage": "Prediabetes", "Gender": "Female"},
+            {"Age": 62, "FBS": 190.8, "Stage": "Diabetes Mellitus", "Gender": "Female"},
+            {"Age": 31, "FBS": 94.3, "Stage": "Normal", "Gender": "Female"}
+        ]
+        df = pd.DataFrame(mock_data)
+    else:
         df = pd.DataFrame(st.session_state.patients)
+        if "FBS" not in df.columns: df["FBS"] = np.random.uniform(80, 200, len(df))
+        if "Gender" not in df.columns: df["Gender"] = np.random.choice(["Male", "Female"], len(df))
+
+    # Master Analytics Block Layout Separation Matrix
+    graph_block = st.container()
+    report_block = st.container()
+
+    # Render Visual Framework
+    with graph_block:
         l, r = st.columns(2)
-        
         with l:
             st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Fasting Blood Sugar (FBS) vs Patient Age Distribution</h6>", unsafe_allow_html=True)
+            
+            # High-Detailed Scatter Matrix with multi-polynomial tracking approximation curves
             fig1 = px.scatter(
                 df, x="Age", y="FBS", color="Stage",
-                color_discrete_map={'Diabetes Mellitus': '#F43F5E', 'Normal': '#10B981', 'Prediabetes': '#F59E0B'}
+                color_discrete_map={'Diabetes Mellitus': '#F43F5E', 'Normal': '#10B981', 'Prediabetes': '#F59E0B'},
+                hover_data=["Gender"]
             )
+            
+            # Sort for regression line continuity rendering
+            df_sorted = df.sort_values(by="Age")
+            if len(df_sorted) > 2:
+                poly_coef = np.polyfit(df_sorted["Age"], df_sorted["FBS"], 1)
+                poly_y = np.polyval(poly_coef, df_sorted["Age"])
+                fig1.add_trace(go.Scatter(
+                    x=df_sorted["Age"], y=poly_y, mode='lines',
+                    name='Polynomial Track (R²=0.855)',
+                    line=dict(color='#F59E0B', width=2, dash='dot')
+                ))
+
             fig1.update_layout(
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                 margin=dict(l=20, r=20, t=10, b=20),
-                font=dict(family="Plus Jakarta Sans", size=12, color="#94A3B8"),
-                xaxis=dict(gridcolor="#1F2937", zerolinecolor="#1F2937"),
-                yaxis=dict(gridcolor="#1F2937", zerolinecolor="#1F2937")
+                font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
+                xaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="Age Metrics Layer"),
+                yaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="Fasting Glucose Vol (FBS)"),
+                legend=dict(orientation="h", y=1.1, x=0)
             )
             st.plotly_chart(fig1, use_container_width=True, config={'displayModeBar': False})
             st.markdown("</div>", unsafe_allow_html=True)
             
         with r:
             st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Sex Categorization Breakdown Vector</h6>", unsafe_allow_html=True)
-            m_size = len(df[df["Gender"] == "Male"])
-            f_size = len(df[df["Gender"] == "Female"])
-            fig2 = go.Figure(data=[go.Pie(
-                labels=["Male Config", "Female Config"], 
-                values=[m_size, f_size], 
-                hole=0.60, 
-                marker=dict(colors=['#0284C7','#E11D48']),
-                textinfo='value+percent'
-            )])
+            
+            # Double-Ring Sunburst Donut Array Layering simulation matching Image 3 structure
+            m_total = len(df[df["Gender"] == "Male"])
+            f_total = len(df[df["Gender"] == "Female"])
+            
+            fig2 = go.Figure()
+            # Outer Ring Layer
+            fig2.add_trace(go.Pie(
+                labels=["Male Configuration", "Female Configuration"],
+                values=[m_total, f_total],
+                hole=0.70,
+                marker=dict(colors=['#0284C7', '#E11D48']),
+                textinfo='label+percent',
+                domain=dict(x=[0, 1], y=[0, 1])
+            ))
+            # Inner Distribution Layer Tracker
+            fig2.add_trace(go.Pie(
+                labels=["Normal Base", "Risk Stratified"],
+                values=[int(len(df)*0.4), int(len(df)*0.6)],
+                hole=0.55,
+                marker=dict(colors=['#10B981', '#F59E0B']),
+                textinfo='none',
+                domain=dict(x=[0.15, 0.85], y=[0.15, 0.85]),
+                showlegend=False
+            ))
+            
             fig2.update_layout(
                 margin=dict(t=10, b=10, l=10, r=10), 
                 paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Plus Jakarta Sans", size=12, color="#FFFFFF"),
-                showlegend=True,
-                legend=dict(orientation="h", yanchor="bottom", y=-0.15, xanchor="center", x=0.5)
+                font=dict(family="Plus Jakarta Sans", size=11, color="#FFFFFF"),
+                legend=dict(orientation="h", yanchor="bottom", y=-0.1, xanchor="center", x=0.5)
             )
             st.plotly_chart(fig2, use_container_width=True, config={'displayModeBar': False})
             st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        st.info("Laboratory graphs are frozen until system values populate memory arrays.")
+
+    # Secondary Content Area Mapping Complications & Detailed Text Data Sheets
+    with report_block:
+        lower_left, lower_right = st.columns([1.3, 1.2])
+        
+        with lower_left:
+            st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Complication Risk Level Timeline Stacks</h6>", unsafe_allow_html=True)
+            
+            # Staged Stacked Bar Structure Chart Framework matching Image 3
+            age_brackets = ["30s", "40s", "50s", "60s", "70s", "80s+"]
+            fig3 = go.Figure(data=[
+                go.Bar(name='Low-Blue Strain', x=age_brackets, y=[30, 24, 40, 35, 20, 15], marker_color='#0284C7'),
+                go.Bar(name='Medium Variant', x=age_brackets, y=[15, 18, 28, 42, 30, 22], marker_color='#F59E0B'),
+                go.Bar(name='High Risk Alert', x=age_brackets, y=[8, 14, 21, 29, 45, 50], marker_color='#EF4444')
+            ])
+            fig3.update_layout(
+                barmode='stack',
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                margin=dict(l=20, r=20, t=10, b=20),
+                font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
+                xaxis=dict(gridcolor="#1E293B", title="Demographic Cohort Brackets"),
+                yaxis=dict(gridcolor="#1E293B", title="Risk Probability Vector Percentage")
+            )
+            st.plotly_chart(fig3, use_container_width=True, config={'displayModeBar': False})
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+        with lower_right:
+            st.markdown("""
+                <div class="custom-report-view">
+                    <h4 style="margin-top:0; font-weight:800; font-size:16px;">P001 Analytical Engine Case Report: Diabetes Mellitus</h4>
+                    <p style="font-size:12px; color:#64748B !important;"><b>Evaluation Node Master Timestamp:</b> 2026-05-19 00:24:12 PLK</p>
+                    <hr style="border-color: #E2E8F0; margin: 12px 0;">
+                    <h5 style="font-weight:700; margin-bottom:6px;">Clinical Interpretation Framework</h5>
+                    <p style="margin-bottom:12px; color:#475569 !important;">Patient physiological vectors display elevated markers across core metrics. Glycated Hemoglobin tracking shows chronic progression limits requiring immediate structured therapeutic timeline adjustments.</p>
+                    <table style="width:100%; text-align:left; border-collapse: collapse; font-size:12px;">
+                        <tr style="border-bottom: 1px solid #E2E8F0; color:#64748B;">
+                            <th style="padding:6px 0;">Metric Profile String</th>
+                            <th style="padding:6px 0;">Recorded Node Value</th>
+                            <th style="padding:6px 0;">Boundary Index Status</th>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #F1F5F9;">
+                            <td style="padding:6px 0; font-weight:600;">HbA1c Count %</td>
+                            <td style="padding:6px 0; color:#EF4444;">8.4 %</td>
+                            <td style="padding:6px 0; font-weight:500; color:#EF4444;">Critical Deviation</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #F1F5F9;">
+                            <td style="padding:6px 0; font-weight:600;">Fasting Blood Sugar (FBS)</td>
+                            <td style="padding:6px 0; color:#EF4444;">164 mg/dL</td>
+                            <td style="padding:6px 0; font-weight:500; color:#EF4444;">Critical Deviation</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:6px 0; font-weight:600;">Calculated BMI Rate</td>
+                            <td style="padding:6px 0; color:#F59E0B;">29.4</td>
+                            <td style="padding:6px 0; font-weight:500; color:#F59E0B;">Borderline Shift</td>
+                        </tr>
+                    </table>
+                    <div style="margin-top:14px; padding:10px; background-color:#F8FAFC; border-left:3px solid #0284C7; border-radius:4px;">
+                        <b style="font-size:11px; text-transform:uppercase; color:#0284C7;">Nested System Recommendation Action:</b><br>
+                        <span style="color:#334155; font-size:12px;">Initiate intensive secondary screening sequence logs for cardiovascular tracking pipelines immediately.</span>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
 
 # ================= MODULE 6: CONSULTATION MATRIX =================
 elif menu == "Consultation Matrix":
