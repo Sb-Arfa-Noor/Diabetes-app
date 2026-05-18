@@ -65,12 +65,13 @@ st.markdown("""
         display: none !important;
     }
 
-    /* CRITICAL FIX: Eliminate keyboard hints, shortcut utility strings and raw labels under buttons completely */
+    /* CRITICAL FIX: Eliminate keyboard hints, shortcut strings and raw labels under buttons completely */
     span[data-testid="stWidgetHint"], 
     .stButton data-shortcut, 
     button p span,
     button[data-testid="baseButton-secondary"] span,
-    div[data-testid="stWidgetLabel"] + div p {
+    div[data-testid="stWidgetLabel"] + div p,
+    button[data-testid="baseButton-secondary"] p {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -225,17 +226,33 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
     }
     
-    /* PRECISE ALIGNMENT FOR THE EXPAND / COLLAPSE CUSTOM ARROWS AS PER IMAGE */
-    .custom-collapse-wrapper button {
+    /* EXACT FIX: Absolute Position Placement For Custom Menu Toggle Arrows */
+    div.fixed-collapse-container {
+        position: fixed !important;
+        top: 10px !important;
+        left: 250px !important;
+        z-index: 999999 !important;
+    }
+    div.fixed-expand-container {
+        position: fixed !important;
+        top: 10px !important;
+        left: 15px !important;
+        z-index: 999999 !important;
+    }
+    
+    /* Raw Style overrides for custom arrow icons without text trace */
+    .fixed-collapse-container button, .fixed-expand-container button {
         background: #111827 !important;
         border: 1px solid #1E293B !important;
         color: #38BDF8 !important;
-        font-size: 16px !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
         padding: 0px !important;
+        margin: 0px !important;
         border-radius: 6px !important;
-        min-width: 36px !important;
-        width: 36px !important;
-        height: 36px !important;
+        width: 32px !important;
+        min-width: 32px !important;
+        height: 32px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -346,24 +363,21 @@ if st.session_state.sidebar_collapsed:
         </style>
     """, unsafe_allow_html=True)
 else:
-    # UPPER TITLE HEADER ROW LAYOUT FOR EXACT CORNER CLOSE POSITION
-    side_head_left, side_head_right = st.sidebar.columns([4.0, 1.0])
-    with side_head_left:
-        st.markdown("""
-        <div style='padding-top: 2px;'>
-            <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
-            <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-    with side_head_right:
-        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 4px; text-align: right;'>", unsafe_allow_html=True)
-        if st.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
-            st.session_state.sidebar_collapsed = True
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
+    # PLACING COLLAPSE ARROW ON EXACT THE POSITION ENCLOSED BY RED MARKS
+    st.markdown('<div class="fixed-collapse-container">', unsafe_allow_html=True)
+    if st.button("‹", key="trigger_sidebar_collapse"):
+        st.session_state.sidebar_collapsed = True
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 10px; margin-bottom:15px;'>", unsafe_allow_html=True)
+    st.sidebar.markdown("""
+    <div style='padding-top: 5px; margin-bottom: 10px;'>
+        <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
+        <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 5px; margin-bottom:15px;'>", unsafe_allow_html=True)
 
     menu = st.sidebar.radio(
         "NAVIGATION NODE",
@@ -378,396 +392,4 @@ else:
         st.session_state.logged_in = False
         st.session_state.auth_screen = "login"
         st.rerun()
-    st.sidebar.markdown("</div>", unsafe_allow_html=True)
-
-# Navigation fallbacks
-if st.session_state.sidebar_collapsed:
-    if "current_menu_node" not in st.session_state:
-        st.session_state.current_menu_node = "Dashboard Overview"
-    menu = st.session_state.current_menu_node
-else:
-    st.session_state.current_menu_node = menu
-
-# ================= CORE VIEW CONTENT REGISTRATION =================
-# FIXED POSITION: Header matching top native structure level exactly
-layout_header_left, layout_header_right = st.columns([0.4, 11.6])
-
-with layout_header_left:
-    if st.session_state.sidebar_collapsed:
-        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 6px;'>", unsafe_allow_html=True)
-        if st.button("»", key="trigger_sidebar_expand", help="Show Side Menu Options"):
-            st.session_state.sidebar_collapsed = False
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        st.write("")
-
-with layout_header_right:
-    if menu == "Dashboard Overview":
-        st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
-
-# View router execution path layers
-if menu == "Dashboard Overview":
-    total = len(st.session_state.patients)
-    positive = len([p for p in st.session_state.patients if p.get("Stage") == "Diabetes Mellitus"])
-    risk = len([p for p in st.session_state.patients if p.get("Stage") == "Prediabetes"])
-    normal = total - positive - risk
-    
-    if total == 0:
-        total, positive, risk, normal = 124, 52, 38, 34
-    
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #38BDF8;"><div class="metric-node-label">Total Logs Managed</div><div class="metric-node-value">{total}</div></div>', unsafe_allow_html=True)
-    with c2: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #F43F5E;"><div class="metric-node-label">Positive Instances</div><div class="metric-node-value">{positive}</div></div>', unsafe_allow_html=True)
-    with c3: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #F59E0B;"><div class="metric-node-label">Prediabetes Risk</div><div class="metric-node-value">{risk}</div></div>', unsafe_allow_html=True)
-    with c4: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #10B981;"><div class="metric-node-label">Normal Physiological</div><div class="metric-node-value">{normal}</div></div>', unsafe_allow_html=True)
-        
-    st.write("<br>", unsafe_allow_html=True)
-    col1, col2 = st.columns([1.4, 1.1])
-    
-    with col1:
-        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Recent Integrated Case Records</h5>", unsafe_allow_html=True)
-        if st.session_state.patients:
-            df = pd.DataFrame(st.session_state.patients).fillna("N/A")
-            st.dataframe(
-                df[["ID", "Name", "Age", "Gender", "Stage"]], 
-                use_container_width=True, 
-                hide_index=True
-            )
-        else:
-            mock_table = pd.DataFrame([
-                {"ID": "P102", "Name": "Ayesha Malik", "Age": 45, "Gender": "Female", "Stage": "Diabetes Mellitus"},
-                {"ID": "P103", "Name": "Zain Ahmed", "Age": 38, "Gender": "Male", "Stage": "Prediabetes"},
-                {"ID": "P104", "Name": "Mariam Khan", "Age": 29, "Gender": "Female", "Stage": "Normal Status"},
-                {"ID": "P105", "Name": "Bilal Siddiqui", "Age": 52, "Gender": "Male", "Stage": "Diabetes Mellitus"}
-            ])
-            st.dataframe(mock_table, use_container_width=True, hide_index=True)
-            
-    with col2:
-        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Population Density Proportions</h5>", unsafe_allow_html=True)
-        
-        fig = go.Figure()
-        fig.add_trace(go.Pie(
-            labels=["Diabetes Mellitus", "Normal Status", "Prediabetes Risk"], 
-            values=[positive, normal, risk], 
-            hole=0.65, 
-            marker=dict(
-                colors=['#F43F5E', '#10B981', '#F59E0B'],
-                line=dict(color='#111C44', width=2)
-            ),
-            textinfo='percent+label',
-            hoverinfo='label+value+percent'
-        ))
-        
-        fig.update_layout(
-            height=310, 
-            margin=dict(l=15, r=15, t=10, b=10), 
-            showlegend=False, 
-            paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Plus Jakarta Sans", color="#FFFFFF")
-        )
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-
-# ================= MODULE 2: DIAGNOSTIC PIPELINE =================
-elif menu == "Diagnostic Pipeline":
-    if "step" not in st.session_state:
-        st.session_state.step = 1
-    
-    with layout_header_right:
-        st.markdown('<div class="main-title-view">AI Inference Architecture</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="sub-title-view">Multi-stage analytics system pipeline — <b>Active Phase Frame {st.session_state.step} of 3</b></div>', unsafe_allow_html=True)
-    
-    if st.session_state.step == 1:
-        st.markdown("<div class='panel-card-container'><h4 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Phase 1: Entry Demographics & Direct Laboratory Glycemic Markers</h4><br>", unsafe_allow_html=True)
-        l, r = st.columns(2)
-        with l:
-            name = st.text_input("Patient Full Identity Name Sequence", placeholder="Enter legal text name string")
-            age = st.number_input("Patient Biological Age Value", min_value=1, max_value=120, value=35)
-            gender = st.selectbox("Biological Sex Taxonomy Configuration", ["Male", "Female"])
-            bmi = st.number_input("Calculated Body Mass Index (BMI Value Ratio)", min_value=10.0, max_value=60.0, value=24.5)
-        with r:
-            fbs = st.number_input("Fasting Blood Sugar Volume (FBS) [mg/dL]", min_value=50.0, max_value=400.0, value=100.0)
-            hba1c = st.number_input("Laboratory Glycated Hemoglobin (HbA1c Count Percent %)", min_value=3.0, max_value=15.0, value=5.8)
-            gtt = st.number_input("2-Hour Postprandial Glucose Tolerance Validation (GTT) [mg/dL]", min_value=50.0, max_value=500.0, value=130.0)
-            contact = st.text_input("Core Contact Mapping Value Sequence", placeholder="Enter numeric contact digits")
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        if st.button("Process Initial Metrics Framework"):
-            if not name.strip():
-                st.error("Constraint violated: Patient identity token vector cannot be structural null.")
-            else:
-                stage = "Normal"
-                if hba1c >= 6.5 or fbs >= 126 or gtt >= 200: stage = "Diabetes Mellitus"
-                elif 5.7 <= hba1c < 6.5 or 100 <= fbs < 126 or 140 <= gtt < 200: stage = "Prediabetes"
-                
-                st.session_state.patient_data = {
-                    "Name": name, "Age": age, "Gender": gender, "BMI": bmi, 
-                    "FBS": fbs, "HbA1c": hba1c, "GTT2Hr": gtt, "Contact": contact, "Stage": stage
-                }
-                
-                if stage == "Diabetes Mellitus":
-                    st.session_state.step = 2
-                else:
-                    p = st.session_state.patient_data.copy()
-                    p["ID"] = f"P{len(st.session_state.patients)+1}"
-                    p["Type"] = "N/A"
-                    p["Complications"] = "None"
-                    p["Date"] = datetime.now().strftime("%Y-%m-%d")
-                    add_patient(p)
-                    st.session_state.patients = get_patients()
-                    st.session_state.step = 3
-                st.rerun()
-
-    elif st.session_state.step == 2:
-        st.markdown("<div class='panel-card-container'><h4 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Phase 2: Etiological Isolation Panels & Pancreatic Endocrine Assays</h4><br>", unsafe_allow_html=True)
-        l, r = st.columns(2)
-        with l:
-            pregnant = st.selectbox("Gestational Pregnancy Status Framework", [0, 1])
-            insulin = st.number_input("Exogenous Insulin Therapeutic Load Volume Units", value=0.0)
-            duration = st.number_input("Historical Sensation Index Duration (Years)", value=0.0)
-            urea = st.number_input("Serum Blood Urea Clearance Filtration Index", value=25.0)
-        with r:
-            antigad = st.selectbox("Anti-Glutamic Acid Decarboxylase (Anti-GAD) Antibody Matrix", [0, 1])
-            ica = st.selectbox("Islet Cell Cytoplasmic Autoantibody (ICA) Matrix Verification", [0, 1])
-            creatinine = st.number_input("Serum Creatinine Clear Level Metrics", value=0.8)
-            smoker = st.selectbox("Tobacco Proclivity Intake Factor Index", [0, 1])
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("Return to Phase 1 Framework"):
-                st.session_state.step = 1
-                st.rerun()
-        with c2:
-            if st.button("Evaluate Secondary Stratification Subtype"):
-                st.session_state.patient_data.update({
-                    "Pregnant": pregnant, "InsulinTotalUnits": insulin, "DMDuration": duration,
-                    "Urea": urea, "AntiGad": antigad, "ICA": ica, "Creatinine": creatinine, "Smoker": smoker,
-                    "HistoryOfGDM": 0, "Triglycerides": 150.0, "DMonSetAge": st.session_state.patient_data["Age"], "IA2A": 0
-                })
-                if antigad == 1 or ica == 1: dtype = "Type 1 Diabetes"
-                elif pregnant == 1: dtype = "Gestational Diabetes"
-                else: dtype = "Type 2 Diabetes"
-                st.session_state.patient_data["Type"] = dtype
-                st.session_state.step = 3
-                st.rerun()
-
-    elif st.session_state.step == 3:
-        st.markdown("<div class='panel-card-container'><h4 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Phase 3: Pipeline Output Diagnostic Struct Analysis</h4>", unsafe_allow_html=True)
-        p = st.session_state.patient_data
-        
-        st.markdown(f"""
-            <div style="background-color: #111827; padding: 24px; border-radius: 8px; border: 1px solid #1E293B;">
-                <h5 style="color: #38BDF8 !important; margin-top: 0; font-weight:800; font-size:18px;">Diagnostic Engine Analytics Evaluation Result</h5>
-                <hr style="margin: 14px 0; border-color:#1E293B;">
-                <p style="margin: 8px 0; font-size:14px; color:#F8FAFC !important;"><b>Identity Label Reference:</b> {p.get('Name')}</p>
-                <p style="margin: 8px 0; font-size:14px; color:#F8FAFC !important;"><b>Physiological Vectors:</b> {p.get('Age')} Years | {p.get('Gender')}</p>
-                <p style="margin: 8px 0; font-size:14px; color:#F8FAFC !important;"><b>Glycemic Level State Map:</b> <span style="color: #F43F5E !important; font-weight: 700;">{p.get('Stage')}</span></p>
-                <p style="margin: 8px 0; font-size:14px; color:#F8FAFC !important;"><b>Isolated Secondary Strain Subtype:</b> {p.get('Type', 'N/A')}</p>
-            </div>
-        """, unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        if p.get("Stage") == "Diabetes Mellitus" and "ID" not in p:
-            if st.button("Commit Diagnostic Struct to Secure Database Rows", use_container_width=True):
-                p["ID"] = f"P{len(st.session_state.patients)+1}"
-                p["Complications"] = "Retinopathy Risk Tracking Target Verified" if p.get("DMDuration", 0) > 5 else "Clear Structural Matrix Boundaries"
-                p["Date"] = datetime.now().strftime("%Y-%m-%d")
-                add_patient(p)
-                st.session_state.patients = get_patients()
-                st.success("Log status successfully pushed to cloud cluster structures.")
-                
-        if st.button("Initialize Fresh Pipeline Tracking Framework", use_container_width=True):
-            st.session_state.step = 1
-            st.session_state.patient_data = {}
-            st.rerun()
-
-# ================= MODULE 3: PATIENTS MATRIX REGISTRY =================
-elif menu == "Patients Matrix Registry":
-    with layout_header_right:
-        st.markdown('<div class="main-title-view">Electronic Health Ledger Database</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sub-title-view">Registry control layers and transactional data table frames</div>', unsafe_allow_html=True)
-    
-    if st.session_state.patients:
-        df = pd.DataFrame(st.session_state.patients).fillna("N/A")
-        search = st.text_input("Filter Local Framework Nodes by Identity Name String", value="")
-        if search:
-            df = df[df["Name"].str.contains(search, case=False, na=False)]
-            
-        st.dataframe(
-            df[["ID", "Name", "Age", "Gender", "Contact", "Stage", "Type"]], 
-            use_container_width=True, 
-            hide_index=True
-        )
-        
-        st.write("<br><br>", unsafe_allow_html=True)
-        st.markdown("<div class='panel-card-container'><h5 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Administrative System Modification Module</h5>", unsafe_allow_html=True)
-        del_target = st.text_input("Target Row Unique ID Reference Sequence to Drop (e.g. P1)", placeholder="Enter row identity mapping sequence...")
-        if st.button("Purge Database Entity Frame"):
-            if del_target:
-                delete_patient(del_target)
-                st.session_state.patients = get_patients()
-                st.success(f"Row allocation {del_target} successfully unlinked from data architecture.")
-                st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        st.info("No compiled metrics logged inside storage records matrix lines.")
-
-# ================= MODULE 4: DATA REPORT CENTER =================
-elif menu == "Data Report Center":
-    with layout_header_right:
-        st.markdown('<div class="main-title-view">Documentation Export Matrices</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sub-title-view">Download formal plain-text electronic verification logs</div>', unsafe_allow_html=True)
-    
-    if st.session_state.patients:
-        df_rep = pd.DataFrame(st.session_state.patients).fillna("N/A")
-        st.markdown("<div class='panel-card-container'>", unsafe_allow_html=True)
-        
-        for idx, row in df_rep.iterrows():
-            c = st.columns([1, 3, 2, 2])
-            c[0].markdown(f"<span style='color:#94A3B8; font-weight:600;'>{row.get('ID')}</span>", unsafe_allow_html=True)
-            c[1].markdown(f"<span style='color:#FFFFFF; font-weight:500;'>{row.get('Name')}</span>", unsafe_allow_html=True)
-            c[2].markdown(f"<span style='color:#38BDF8;'>{row.get('Stage')}</span>", unsafe_allow_html=True)
-            
-            report_body = f"DIABETESCARE AI DIAGNOSTIC REPORT\n=================================\nID: {row.get('ID')}\nPatient Name: {row.get('Name')}\nDiagnosis Stage: {row.get('Stage')}\nClassification Sub-type: {row.get('Type', 'N/A')}\nTimestamp: {datetime.now().strftime('%Y-%m-%d')}"
-            c[3].download_button("Export Plain Text Log", data=report_body, file_name=f"EHR_Report_{row.get('Name')}.txt", key=f"btn_{idx}")
-        st.markdown("</div>", unsafe_allow_html=True)
-    else:
-        st.info("No file object generation arrays detected in data nodes.")
-
-# ================= MODULE 5: VISUAL ANALYTICS NODE =================
-elif menu == "Visual Analytics Node":
-    with layout_header_right:
-        st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
-
-    if not st.session_state.patients:
-        mock_data = [
-            {"Age": 34, "FBS": 100.5, "Stage": "Prediabetes", "Gender": "Male"},
-            {"Age": 45, "FBS": 140.2, "Stage": "Diabetes Mellitus", "Gender": "Female"},
-            {"Age": 28, "FBS": 88.0, "Stage": "Normal", "Gender": "Male"},
-            {"Age": 56, "FBS": 165.4, "Stage": "Diabetes Mellitus", "Gender": "Male"},
-            {"Age": 39, "FBS": 112.1, "Stage": "Prediabetes", "Gender": "Female"},
-            {"Age": 62, "FBS": 190.8, "Stage": "Diabetes Mellitus", "Gender": "Female"},
-            {"Age": 31, "FBS": 94.3, "Stage": "Normal", "Gender": "Female"}
-        ]
-        df = pd.DataFrame(mock_data)
-    else:
-        df = pd.DataFrame(st.session_state.patients)
-        if "FBS" not in df.columns: df["FBS"] = np.random.uniform(80, 200, len(df))
-        if "Gender" not in df.columns: df["Gender"] = np.random.choice(["Male", "Female"], len(df))
-
-    l, r = st.columns(2)
-    with l:
-        st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Fasting Blood Sugar (FBS) vs Patient Age Distribution</h6>", unsafe_allow_html=True)
-        
-        fig1 = px.scatter(
-            df, x="Age", y="FBS", color="Stage",
-            color_discrete_map={'Diabetes Mellitus': '#F43F5E', 'Normal': '#10B981', 'Prediabetes': '#F59E0B'}
-        )
-        
-        fig1.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            margin=dict(l=20, r=20, t=10, b=20),
-            font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
-            xaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="Age Metrics Layer"),
-            yaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="Fasting Glucose Vol (FBS)"),
-            legend=dict(orientation="h", y=1.1, x=0)
-        )
-        st.plotly_chart(fig1, use_container_width=True, config={'displayModeBar': False})
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-    with r:
-        st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Sex Categorization Breakdown Vector</h6>", unsafe_allow_html=True)
-        
-        m_total = len(df[df["Gender"] == "Male"])
-        f_total = len(df[df["Gender"] == "Female"])
-        
-        fig2 = go.Figure()
-        fig2.add_trace(go.Pie(
-            labels=["Male Configuration", "Female Configuration"],
-            values=[m_total, f_total],
-            hole=0.70,
-            marker=dict(colors=['#0284C7', '#E11D48']),
-            textinfo='label+percent'
-        ))
-        
-        fig2.update_layout(
-            margin=dict(t=10, b=10, l=10, r=10), 
-            paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Plus Jakarta Sans", size=11, color="#FFFFFF"),
-            legend=dict(orientation="h", yanchor="bottom", y=-0.1, xanchor="center", x=0.5)
-        )
-        st.plotly_chart(fig2, use_container_width=True, config={'displayModeBar': False})
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    lower_left, lower_right = st.columns([1.3, 1.2])
-    with lower_left:
-        st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Complication Risk Level Timeline Stacks</h6>", unsafe_allow_html=True)
-        
-        age_brackets = ["30s", "40s", "50s", "60s", "70s", "80s+"]
-        fig3 = go.Figure(data=[
-            go.Bar(name='Low-Blue Strain', x=age_brackets, y=[30, 24, 40, 35, 20, 15], marker_color='#0284C7'),
-            go.Bar(name='Medium Variant', x=age_brackets, y=[15, 18, 28, 42, 30, 22], marker_color='#F59E0B'),
-            go.Bar(name='High Risk Alert', x=age_brackets, y=[8, 14, 21, 29, 45, 50], marker_color='#EF4444')
-        ])
-        fig3.update_layout(
-            barmode='stack',
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            margin=dict(l=20, r=20, t=10, b=20),
-            font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
-            xaxis=dict(gridcolor="#1E293B", title="Demographic Cohort Brackets"),
-            yaxis=dict(gridcolor="#1E293B", title="Risk Probability Vector Percentage")
-        )
-        st.plotly_chart(fig3, use_container_width=True, config={'displayModeBar': False})
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-    with lower_right:
-        st.markdown("""
-            <div class="custom-report-view">
-                <h4 style="margin-top:0; font-weight:800; font-size:16px;">P001 Analytical Engine Case Report: Diabetes Mellitus</h4>
-                <p style="font-size:12px; color:#64748B !important;"><b>Evaluation Node Master Timestamp:</b> 2026-05-19 00:24:12 PLK</p>
-                <hr style="border-color: #E2E8F0; margin: 12px 0;">
-                <table style="width:100%; text-align:left; border-collapse: collapse; font-size:12px;">
-                    <tr style="border-bottom: 1px solid #E2E8F0; color:#64748B;">
-                        <th style="padding:6px 0;">Metric Profile String</th>
-                        <th style="padding:6px 0;">Recorded Node Value</th>
-                        <th style="padding:6px 0;">Boundary Index Status</th>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #F1F5F9;">
-                        <td style="padding:6px 0; font-weight:600;">HbA1c Count %</td>
-                        <td style="padding:6px 0; color:#EF4444;">8.4 %</td>
-                        <td style="padding:6px 0; font-weight:500; color:#EF4444;">Critical Deviation</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid #F1F5F9;">
-                        <td style="padding:6px 0; font-weight:600;">Fasting Blood Sugar (FBS)</td>
-                        <td style="padding:6px 0; color:#EF4444;">164 mg/dL</td>
-                        <td style="padding:6px 0; font-weight:500; color:#EF4444;">Critical Deviation</td>
-                    </tr>
-                </table>
-                <div style="margin-top:14px; padding:10px; background-color:#F8FAFC; border-left:3px solid #0284C7; border-radius:4px;">
-                    <b style="font-size:11px; text-transform:uppercase; color:#0284C7;">Nested System Recommendation Action:</b><br>
-                    <span style="color:#334155; font-size:12px;">Initiate intensive secondary screening sequence logs for cardiovascular tracking pipelines immediately.</span>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-
-# ================= MODULE 6: CONSULTATION MATRIX =================
-elif menu == "Consultation Matrix":
-    with layout_header_right:
-        st.markdown('<div class="main-title-view">Clinical Allocation Matrix Grid</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sub-title-view">Time logs tracking operational consultation scheduling blocks</div>', unsafe_allow_html=True)
-    
-    sche_df = pd.DataFrame({
-        "Patient Identity Mapping String": ["John Doe", "Sarah Khan", "Ali Raza"],
-        "Assigned Medical Practitioner": ["Dr. Ahmed Khan", "Dr. Ahmed Khan", "Dr. Ahmed Khan"],
-        "Target Allocation Time Window": ["18 May - 10:00 AM", "19 May - 11:30 AM", "20 May - 02:00 PM"],
-        "Current Verification Pipeline Flags": ["Confirmed Structure Log", "In Review Validation Queue", "Confirmed Structure Log"]
-    })
-    
-    st.dataframe(
-        sche_df, 
-        use_container_width=True, 
-        hide_index=True
-    )
+    st.sidebar.markdown("</div>
