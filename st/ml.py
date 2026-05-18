@@ -65,9 +65,27 @@ st.markdown("""
         display: none !important;
     }
 
-    /* FIXED: Removed the aggressive text hiding rules that were breaking button texts */
-    span[data-testid="stWidgetHint"] {
+    /* CRITICAL FIX: Eliminate keyboard hints, native icon textual artifacts and raw ghost labels completely */
+    span[data-testid="stWidgetHint"], 
+    .stButton data-shortcut, 
+    button p span,
+    button[data-testid="baseButton-secondary"] span,
+    div[data-testid="stWidgetLabel"] + div p,
+    section[data-testid="stSidebar"] h1 a,
+    section[data-testid="stSidebar"] [data-testid="stMarkdown"] blockquote {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0px !important;
+        height: 0px !important;
+    }
+    
+    /* Absolute suppression of native overlay text glitches like keyboard_double */
+    section[data-testid="stSidebar"] div div div {
+        color: transparent !important;
+    }
+    section[data-testid="stSidebar"] div div div * {
+        color: initial;
     }
     
     /* Main Streamlit Core Overrides */
@@ -86,13 +104,30 @@ st.markdown("""
         padding: 8px 12px !important;
     }
     
-    /* ABSOLUTE REMOVAL OF SCROLLBARS FROM THE SIDE MENU CONTAINER */
+    /* ABSOLUTE REMOVAL OF SCROLLBARS AND CONTENT CLIPPING FROM SIDEBAR */
     section[data-testid="stSidebar"] {
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
-        padding: 10px 14px !important;
+        padding: 12px 14px !important;
+        overflow: hidden !important;
     }
     
+    section[data-testid="stSidebar"]::-webkit-scrollbar,
+    section[data-testid="stSidebar"] *::-webkit-scrollbar {
+        display: none !important;
+        width: 0px !important;
+        height: 0px !important;
+    }
+    
+    section[data-testid="stSidebar"] div, 
+    section[data-testid="stSidebar"] div[data-testid="stSidebarUserContent"],
+    section[data-testid="stSidebar"] .stBlock,
+    section[data-testid="stSidebar"] [role="radiogroup"] {
+        overflow: hidden !important;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+    }
+
     /* Custom Sidebar Radio Element Styling Hack */
     div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label {
         background-color: #111827 !important;
@@ -134,7 +169,6 @@ st.markdown("""
         color: #F8FAFC !important;
         letter-spacing: -0.75px;
         margin-bottom: 4px;
-        margin-top: 10px;
     }
     .sub-title-view {
         font-size: 14px;
@@ -208,25 +242,26 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
     }
     
-    /* FIXED: Adjusted collapse wrapper sizing to keep text visible and well proportioned */
+    /* PRECISE ALIGNMENT FOR THE EXPAND / COLLAPSE CUSTOM ARROWS AS PER IMAGE */
     .custom-collapse-wrapper button {
         background: #111827 !important;
         border: 1px solid #1E293B !important;
         color: #38BDF8 !important;
         font-size: 16px !important;
-        font-weight: bold !important;
+        padding: 0px !important;
         border-radius: 6px !important;
-        width: 42px !important;
-        height: 42px !important;
+        min-width: 36px !important;
+        width: 36px !important;
+        height: 36px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
     }
     
-    /* Sidebar Lower Spacing Grid Configuration */
+    /* Sidebar Lower Spacing Grid Configuration to clear absolute boundary lines */
     .sidebar-bottom-panel-padded {
         padding: 10px 12px 15px 12px !important;
-        margin-top: 25px;
+        margin-top: 15px;
     }
 
     div[data-testid="stDataFrame"] {
@@ -328,24 +363,24 @@ if st.session_state.sidebar_collapsed:
         </style>
     """, unsafe_allow_html=True)
 else:
-    # FIXED: Reordered layout to place the control button elegantly beside the title text
-    side_head_left, side_head_right = st.sidebar.columns([3.5, 1.5])
-    with side_head_left:
-        st.markdown("""
-        <div style='padding-top: 2px;'>
-            <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
-            <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-    with side_head_right:
-        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 4px; display: flex; justify-content: flex-end;'>", unsafe_allow_html=True)
+    # 1. TOP POSITIONED BUTTON LAYOUT
+    side_top_left, side_top_right = st.sidebar.columns([4.0, 1.0])
+    with side_top_left:
+        st.write("") # Left gap buffer for precise balancing
+    with side_top_right:
+        st.markdown("<div class='custom-collapse-wrapper' style='text-align: right; margin-bottom: 5px;'>", unsafe_allow_html=True)
         if st.sidebar.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
             st.session_state.sidebar_collapsed = True
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 15px; margin-bottom:15px;'>", unsafe_allow_html=True)
+    # 2. HEADERS RENDERED EXACTLY BELOW THE BUTTON
+    st.sidebar.markdown("""
+    <div style='padding: 0px 4px; margin-bottom: 25px;'>
+        <div style='color: #FFFFFF; font-weight: 800; font-size: 24px; letter-spacing: -0.5px; line-height: 1.2;'>DiabetesCare AI</div>
+        <div style='color: #38BDF8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px; line-height: 1.1;'>Clinical Neural Center</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     menu = st.sidebar.radio(
         "NAVIGATION NODE",
@@ -353,9 +388,9 @@ else:
         label_visibility="collapsed"
     )
 
-    # Lower Container Space
+    # Lower Container Space With Protected Distance From Corner Lines
     st.sidebar.markdown("<div class='sidebar-bottom-panel-padded'>", unsafe_allow_html=True)
-    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-bottom: 16px;'>", unsafe_allow_html=True)
+    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-bottom: 16px; margin-top: 20px;'>", unsafe_allow_html=True)
     if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
         st.session_state.logged_in = False
         st.session_state.auth_screen = "login"
@@ -371,12 +406,12 @@ else:
     st.session_state.current_menu_node = menu
 
 # ================= CORE VIEW CONTENT REGISTRATION =================
-# FIXED POSITION: Restructured header column configuration to completely prevent text blocking
-layout_header_left, layout_header_right = st.columns([0.6, 11.4])
+# FIXED POSITION: Header matching top native structure level exactly
+layout_header_left, layout_header_right = st.columns([0.4, 11.6])
 
 with layout_header_left:
     if st.session_state.sidebar_collapsed:
-        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 12px;'>", unsafe_allow_html=True)
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 6px;'>", unsafe_allow_html=True)
         if st.button("»", key="trigger_sidebar_expand", help="Show Side Menu Options"):
             st.session_state.sidebar_collapsed = False
             st.rerun()
