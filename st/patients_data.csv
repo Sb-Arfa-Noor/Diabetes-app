@@ -1,0 +1,2 @@
+Name,Age,Gender,BMI,FBS,GTT,HbA1c,LDL,HDL,Contact,FamilyHistory,Stage,Pregnant,HistoryOfGDM,InsulinTotalUnits,Triglycerides,DMDuration,DMonSetAge,AntiGad,IA2A,ICA,Smoker,Urea,Creatinine,Type,EGFR,SystolicBP,DiastolicBP,Complications
+ali,23,Male,78.0,123.0,78.0,34.0,67.0,12.0,122334,Yes,Diabetes Mellitus,0.0,1.0,45.0,123.0,56.0,23.0,1.0,0.0,1.0,1.0,78.0,56.0,Type 1 Diabetes,144.0,55.0,90.0,"Neuropathy, Nephropathy"
