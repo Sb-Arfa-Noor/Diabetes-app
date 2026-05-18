@@ -33,7 +33,7 @@ if "auth_screen" not in st.session_state:
 
 if "auth_registry" not in st.session_state:
     st.session_state.auth_registry = {
-        "admin": "password"  # Core Master Admin Account
+        "admin": "password"
     }
 
 if "patients" not in st.session_state:
@@ -42,8 +42,9 @@ if "patients" not in st.session_state:
 if "patient_data" not in st.session_state:
     st.session_state.patient_data = {}
 
-if "sidebar_state" not in st.session_state:
-    st.session_state.sidebar_state = "expanded"
+# Navigation state for sidebar window management
+if "sidebar_collapsed" not in st.session_state:
+    st.session_state.sidebar_collapsed = False
 
 # ================= PREMIUM EXECUTIVE DARK BLUE CSS STYLING =================
 st.markdown("""
@@ -52,18 +53,18 @@ st.markdown("""
     
     /* Core Application Framework Theme */
     .stApp {
-        background-color: #0B0F19; /* Executive Deep Dark Blue Space */
+        background-color: #0B0F19;
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
     
-    /* Strict Typography Controls Override */
+    /* Typography Controls Override */
     h1, h2, h3, h4, h5, h6, p, label, span, div {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
     
     /* Main Streamlit Core Overrides */
     div[data-testid="stWidgetLabel"] p {
-        color: #94A3B8 !important; /* Soft Silver Blue for Inputs */
+        color: #94A3B8 !important;
         font-weight: 500 !important;
         font-size: 13px !important;
         letter-spacing: 0.2px;
@@ -81,8 +82,12 @@ st.markdown("""
     section[data-testid="stSidebar"] {
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
-        padding-top: 10px;
-        transition: width 0.3s ease, transform 0.3s ease !important;
+        padding-top: 0px !important;
+    }
+    
+    /* Native Toggle Button Disabler to completely utilize Custom Actions */
+    button[data-testid="sidebar-toggle-button"] {
+        display: none !important;
     }
     
     /* Custom Sidebar Radio Element Styling Hack */
@@ -96,7 +101,7 @@ st.markdown("""
         width: 100%;
     }
     div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label:hover {
-        border-color: #38BDF8 !important; /* Premium Cyan Light Accent */
+        border-color: #38BDF8 !important;
         background-color: #1E293B !important;
     }
     div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label[data-checked="true"] {
@@ -111,27 +116,27 @@ st.markdown("""
     
     /* Clean Premium Layout Cards */
     .panel-card-container {
-        background: #111C44; /* Image Matching Classic Deep Navy Blue */
-        padding: 28px;
+        background: #111C44;
+        padding: 24px;
         border-radius: 12px;
         border: 1px solid #1E293B;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-        margin-bottom: 24px;
+        margin-bottom: 20px;
     }
     
     /* Premium Title Headers Layout */
     .main-title-view {
-        font-size: 32px;
+        font-size: 28px;
         font-weight: 800;
         color: #F8FAFC !important;
         letter-spacing: -0.75px;
         margin-bottom: 4px;
     }
     .sub-title-view {
-        font-size: 14px;
-        color: #38BDF8 !important; /* Neon Electric Blue Secondary Tint */
+        font-size: 13px;
+        color: #38BDF8 !important;
         font-weight: 500;
-        margin-bottom: 30px;
+        margin-bottom: 24px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -139,7 +144,7 @@ st.markdown("""
     /* High-End Clean Metric Node Structure */
     .metric-node-box {
         background: #111C44;
-        padding: 24px;
+        padding: 20px;
         border-radius: 12px;
         border: 1px solid #1E293B;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -152,10 +157,10 @@ st.markdown("""
         letter-spacing: 1px;
     }
     .metric-node-value {
-        font-size: 32px;
+        font-size: 28px;
         font-weight: 800;
         color: #FFFFFF !important;
-        margin-top: 6px;
+        margin-top: 4px;
     }
     
     /* Authentic Clean Login Box Layout */
@@ -184,10 +189,10 @@ st.markdown("""
     
     /* Custom High Contrast Core System Buttons */
     .stButton>button {
-        background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%) !important; /* High Grade Electric Cyan-Blue Gradient */
+        background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%) !important;
         color: #FFFFFF !important;
         border-radius: 8px !important;
-        padding: 12px 28px !important;
+        padding: 10px 24px !important;
         font-weight: 600 !important;
         font-size: 14px !important;
         border: none !important;
@@ -197,6 +202,19 @@ st.markdown("""
     .stButton>button:hover {
         transform: translateY(-1px) !important;
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
+    }
+    
+    /* Micro-Toggle Styles overriding plain streamlit rendering */
+    .arrow-fixed-trigger button {
+        background: #111C44 !important;
+        color: #38BDF8 !important;
+        border: 1px solid #1E293B !important;
+        font-weight: 800 !important;
+        font-size: 18px !important;
+        border-radius: 6px !important;
+        padding: 2px 10px !important;
+        height: 38px !important;
+        width: 42px !important;
     }
     
     /* Streamlit Interactive Dataframe Custom Dark Theme Polish */
@@ -210,17 +228,29 @@ st.markdown("""
     .custom-report-view {
         background-color: #FFFFFF !important;
         color: #1E293B !important;
-        padding: 30px;
+        padding: 24px;
         border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         font-size: 13px;
-        line-height: 1.6;
+        line-height: 1.5;
     }
     .custom-report-view h4, .custom-report-view h5, .custom-report-view p, .custom-report-view b {
         color: #1E293B !important;
     }
 </style>
 """, unsafe_allow_html=True)
+
+# ================= INJECT TRIGGER FOR ARROWS INVERSION OVERRIDES =================
+if st.session_state.sidebar_collapsed:
+    st.markdown("""
+        <style>
+            section[data-testid="stSidebar"] {
+                width: 0px !important;
+                min-width: 0px !important;
+                transform: translateX(-350px) !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
 # ================= FUNCTIONAL AUTHENTICATION FLOW =================
 if not st.session_state.logged_in:
@@ -285,59 +315,55 @@ if not st.session_state.logged_in:
                 st.rerun()
     st.stop()
 
-# ================= CORPORATE NAVIGATION MENU =================
-st.sidebar.markdown("""
-<div style='padding: 24px 12px 16px 12px;'>
-    <div style='color: #FFFFFF; font-weight: 800; font-size:24px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
-    <div style='color: #38BDF8; font-size: 11px; margin-top: 4px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
-</div>
-<hr style='border-color: #1E293B; margin-top: 0px; margin-bottom:20px;'>
-""", unsafe_allow_html=True)
+# ================= GLOBAL SIDEBAR RENDERING SYSTEM =================
+with st.sidebar:
+    # Absolute alignment for Top-Right close button inside Sidebar window panel context
+    side_col1, side_col2 = st.columns([4, 1])
+    with side_col1:
+        st.markdown("""
+        <div style='padding: 16px 0px 4px 0px;'>
+            <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
+            <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with side_col2:
+        st.markdown('<div class="arrow-fixed-trigger" style="margin-top:20px; text-align:right;">', unsafe_allow_html=True)
+        if st.button("«", key="trigger_close_sb", help="Collapse Navigation Menu"):
+            st.session_state.sidebar_collapsed = True
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    st.markdown("<hr style='border-color: #1E293B; margin-top: 8px; margin-bottom:16px;'>", unsafe_allow_html=True)
+    
+    menu = st.sidebar.radio(
+        "NAVIGATION NODE",
+        ["Dashboard Overview", "Patients Matrix Registry", "Diagnostic Pipeline", "Data Report Center", "Visual Analytics Node", "Consultation Matrix"],
+        label_visibility="collapsed"
+    )
+    
+    st.sidebar.markdown("<br><br><hr style='border-color: #1E293B;'>", unsafe_allow_html=True)
+    if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
+        st.session_state.logged_in = False
+        st.session_state.auth_screen = "login"
+        st.rerun()
 
-menu = st.sidebar.radio(
-    "NAVIGATION NODE",
-    ["Dashboard Overview", "Patients Matrix Registry", "Diagnostic Pipeline", "Data Report Center", "Visual Analytics Node", "Consultation Matrix"],
-    label_visibility="collapsed"
-)
-
-st.sidebar.markdown("<br><br><hr style='border-color: #1E293B;'>", unsafe_allow_html=True)
-if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
-    st.session_state.logged_in = False
-    st.session_state.auth_screen = "login"
-    st.rerun()
+# ================= TOP ARCHITECTURAL ARROW IF SIDEBAR IS CLOSED =================
+if st.session_state.sidebar_collapsed:
+    # Trigger display at the absolute top-left corner profile frame layout
+    top_col1, top_col2 = st.columns([0.08, 0.92])
+    with top_col1:
+        st.markdown('<div class="arrow-fixed-trigger" style="margin-top:4px;">', unsafe_allow_html=True)
+        if st.button("»", key="trigger_open_sb", help="Expand Navigation Menu"):
+            st.session_state.sidebar_collapsed = False
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    with top_col2:
+        st.write("") # Retain structure tracking layout
 
 # ================= MODULE 1: DASHBOARD OVERVIEW =================
 if menu == "Dashboard Overview":
-    # Clean & Professional Sidebar Toggle/State Management Layout using True Icons
-    title_left, title_right = st.columns([5, 1.2])
-    with title_left:
-        st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
-    with title_right:
-        st.write("<p style='margin:0; font-size:10px; color:#94A3B8; font-weight:700; text-align:center; letter-spacing:0.5px;'>SIDEBAR WINDOW</p>", unsafe_allow_html=True)
-        arr_col1, arr_col2 = st.columns(2)
-        with arr_col1:
-            if st.button("«", key="close_nav_bar", use_container_width=True, help="Collapse Side Menu"):
-                st.markdown("""
-                    <style>
-                        section[data-testid="stSidebar"] {
-                            width: 0px !important;
-                            min-width: 0px !important;
-                            transform: translateX(-350px) !important;
-                        }
-                    </style>
-                """, unsafe_allow_html=True)
-        with arr_col2:
-            if st.button("»", key="open_nav_bar", use_container_width=True, help="Expand Side Menu"):
-                st.markdown("""
-                    <style>
-                        section[data-testid="stSidebar"] {
-                            width: 336px !important;
-                            min-width: 336px !important;
-                            transform: translateX(0px) !important;
-                        }
-                    </style>
-                """, unsafe_allow_html=True)
+    st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
     
     # Calculate Data Structures
     total = len(st.session_state.patients)
@@ -345,7 +371,6 @@ if menu == "Dashboard Overview":
     risk = len([p for p in st.session_state.patients if p.get("Stage") == "Prediabetes"])
     normal = total - positive - risk
     
-    # Fallback Data Allocation agar data empty ho
     if total == 0:
         total, positive, risk, normal = 124, 52, 38, 34
     
@@ -356,7 +381,7 @@ if menu == "Dashboard Overview":
     with c4: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #10B981;"><div class="metric-node-label">Normal Physiological</div><div class="metric-node-value">{normal}</div></div>', unsafe_allow_html=True)
         
     st.write("<br>", unsafe_allow_html=True)
-    col1, col2 = st.columns([1.4, 1.1])
+    col1, col2 = st.columns([1.5, 1.0])
     
     with col1:
         st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Recent Integrated Case Records</h5>", unsafe_allow_html=True)
@@ -365,7 +390,8 @@ if menu == "Dashboard Overview":
             st.dataframe(
                 df[["ID", "Name", "Age", "Gender", "Stage"]], 
                 use_container_width=True, 
-                hide_index=True
+                hide_index=True,
+                height=260
             )
         else:
             mock_table = pd.DataFrame([
@@ -374,32 +400,32 @@ if menu == "Dashboard Overview":
                 {"ID": "P104", "Name": "Mariam Khan", "Age": 29, "Gender": "Female", "Stage": "Normal Status"},
                 {"ID": "P105", "Name": "Bilal Siddiqui", "Age": 52, "Gender": "Male", "Stage": "Diabetes Mellitus"}
             ])
-            st.dataframe(mock_table, use_container_width=True, hide_index=True)
+            st.dataframe(mock_table, use_container_width=True, hide_index=True, height=260)
             
     with col2:
         st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Population Density Proportions</h5>", unsafe_allow_html=True)
         
-        # VALIDATED ERROR-FREE: Heavy Professional Donut Chart
         fig = go.Figure()
-        
         fig.add_trace(go.Pie(
             labels=["Diabetes Mellitus", "Normal Status", "Prediabetes Risk"], 
             values=[positive, normal, risk], 
-            hole=0.65, 
+            hole=0.68, 
             marker=dict(
                 colors=['#F43F5E', '#10B981', '#F59E0B'],
                 line=dict(color='#111C44', width=2)
             ),
-            textinfo='percent+label',
+            textinfo='percent',
             hoverinfo='label+value+percent'
         ))
         
+        # FIXED SIZE: Scaled down perfectly to match layout height limits cleanly
         fig.update_layout(
-            height=310, 
-            margin=dict(l=15, r=15, t=10, b=10), 
-            showlegend=False, 
+            height=260, 
+            margin=dict(l=10, r=10, t=5, b=5), 
+            showlegend=True, 
             paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Plus Jakarta Sans", color="#FFFFFF")
+            font=dict(family="Plus Jakarta Sans", color="#FFFFFF", size=10),
+            legend=dict(orientation="v", yanchor="middle", y=0.5, xanchor="left", x=1.0)
         )
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
@@ -569,21 +595,8 @@ elif menu == "Data Report Center":
 
 # ================= MODULE 5: VISUAL ANALYTICS NODE =================
 elif menu == "Visual Analytics Node":
-    title_left, title_right = st.columns([4, 1])
-    with title_left:
-        st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
-    with title_right:
-        st.write("<p style='margin:0; font-size:11px; color:#94A3B8; font-weight:700; text-align:right; letter-spacing:1px;'>LAYOUT TOGGLE</p>", unsafe_allow_html=True)
-        btn_col1, btn_col2 = st.columns(2)
-        with btn_col1:
-            if st.button("↑", key="layout_up_arrow", use_container_width=True):
-                st.session_state.layout_invert = False
-                st.rerun()
-        with btn_col2:
-            if st.button("↓", key="layout_down_arrow", use_container_width=True):
-                st.session_state.layout_invert = True
-                st.rerun()
+    st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
 
     if not st.session_state.patients:
         mock_data = [
@@ -601,124 +614,106 @@ elif menu == "Visual Analytics Node":
         if "FBS" not in df.columns: df["FBS"] = np.random.uniform(80, 200, len(df))
         if "Gender" not in df.columns: df["Gender"] = np.random.choice(["Male", "Female"], len(df))
 
-    graph_block = st.container()
-    report_block = st.container()
-
-    with graph_block:
-        l, r = st.columns(2)
-        with l:
-            st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Fasting Blood Sugar (FBS) vs Patient Age Distribution</h6>", unsafe_allow_html=True)
-            
-            fig1 = px.scatter(
-                df, x="Age", y="FBS", color="Stage",
-                color_discrete_map={'Diabetes Mellitus': '#F43F5E', 'Normal': '#10B981', 'Prediabetes': '#F59E0B'},
-                hover_data=["Gender"]
-            )
-            
-            df_sorted = df.sort_values(by="Age")
-            if len(df_sorted) > 2:
-                poly_coef = np.polyfit(df_sorted["Age"], df_sorted["FBS"], 1)
-                poly_y = np.polyval(poly_coef, df_sorted["Age"])
-                fig1.add_trace(go.Scatter(
-                    x=df_sorted["Age"], y=poly_y, mode='lines',
-                    name='Polynomial Track (R²=0.855)',
-                    line=dict(color='#F59E0B', width=2, dash='dot')
-                ))
-
-            fig1.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                margin=dict(l=20, r=20, t=10, b=20),
-                font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
-                xaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="Age Metrics Layer"),
-                yaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="Fasting Glucose Vol (FBS)"),
-                legend=dict(orientation="h", y=1.1, x=0)
-            )
-            st.plotly_chart(fig1, use_container_width=True, config={'displayModeBar': False})
-            st.markdown("</div>", unsafe_allow_html=True)
-            
-        with r:
-            st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Sex Categorization Breakdown Vector</h6>", unsafe_allow_html=True)
-            
-            m_total = len(df[df["Gender"] == "Male"])
-            f_total = len(df[df["Gender"] == "Female"])
-            
-            fig2 = go.Figure()
-            fig2.add_trace(go.Pie(
-                labels=["Male Configuration", "Female Configuration"],
-                values=[m_total, f_total],
-                hole=0.70,
-                marker=dict(colors=['#0284C7', '#E11D48']),
-                textinfo='label+percent'
-            ))
-            
-            fig2.update_layout(
-                margin=dict(t=10, b=10, l=10, r=10), 
-                paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Plus Jakarta Sans", size=11, color="#FFFFFF"),
-                legend=dict(orientation="h", yanchor="bottom", y=-0.1, xanchor="center", x=0.5)
-            )
-            st.plotly_chart(fig2, use_container_width=True, config={'displayModeBar': False})
-            st.markdown("</div>", unsafe_allow_html=True)
-
-    with report_block:
-        lower_left, lower_right = st.columns([1.3, 1.2])
+    l, r = st.columns(2)
+    with l:
+        st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:10px;'>Fasting Blood Sugar (FBS) vs Patient Age</h6>", unsafe_allow_html=True)
         
-        with lower_left:
-            st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Complication Risk Level Timeline Stacks</h6>", unsafe_allow_html=True)
-            
-            age_brackets = ["30s", "40s", "50s", "60s", "70s", "80s+"]
-            fig3 = go.Figure(data=[
-                go.Bar(name='Low-Blue Strain', x=age_brackets, y=[30, 24, 40, 35, 20, 15], marker_color='#0284C7'),
-                go.Bar(name='Medium Variant', x=age_brackets, y=[15, 18, 28, 42, 30, 22], marker_color='#F59E0B'),
-                go.Bar(name='High Risk Alert', x=age_brackets, y=[8, 14, 21, 29, 45, 50], marker_color='#EF4444')
-            ])
-            fig3.update_layout(
-                barmode='stack',
-                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                margin=dict(l=20, r=20, t=10, b=20),
-                font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
-                xaxis=dict(gridcolor="#1E293B", title="Demographic Cohort Brackets"),
-                yaxis=dict(gridcolor="#1E293B", title="Risk Probability Vector Percentage")
-            )
-            st.plotly_chart(fig3, use_container_width=True, config={'displayModeBar': False})
-            st.markdown("</div>", unsafe_allow_html=True)
-            
-        with lower_right:
-            st.markdown("""
-                <div class="custom-report-view">
-                    <h4 style="margin-top:0; font-weight:800; font-size:16px;">P001 Analytical Engine Case Report: Diabetes Mellitus</h4>
-                    <p style="font-size:12px; color:#64748B !important;"><b>Evaluation Node Master Timestamp:</b> 2026-05-19 00:24:12 PLK</p>
-                    <hr style="border-color: #E2E8F0; margin: 12px 0;">
-                    <h5 style="font-weight:700; margin-bottom:6px;">Clinical Interpretation Framework</h5>
-                    <p style="margin-bottom:12px; color:#475569 !important;">Patient physiological vectors display elevated markers across core metrics. Glycated Hemoglobin tracking shows chronic progression limits requiring immediate structured therapeutic timeline adjustments.</p>
-                    <table style="width:100%; text-align:left; border-collapse: collapse; font-size:12px;">
-                        <tr style="border-bottom: 1px solid #E2E8F0; color:#64748B;">
-                            <th style="padding:6px 0;">Metric Profile String</th>
-                            <th style="padding:6px 0;">Recorded Node Value</th>
-                            <th style="padding:6px 0;">Boundary Index Status</th>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #F1F5F9;">
-                            <td style="padding:6px 0; font-weight:600;">HbA1c Count %</td>
-                            <td style="padding:6px 0; color:#EF4444;">8.4 %</td>
-                            <td style="padding:6px 0; font-weight:500; color:#EF4444;">Critical Deviation</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid #F1F5F9;">
-                            <td style="padding:6px 0; font-weight:600;">Fasting Blood Sugar (FBS)</td>
-                            <td style="padding:6px 0; color:#EF4444;">164 mg/dL</td>
-                            <td style="padding:6px 0; font-weight:500; color:#EF4444;">Critical Deviation</td>
-                        </tr>
-                        <tr>
-                            <td style="padding:6px 0; font-weight:600;">Calculated BMI Rate</td>
-                            <td style="padding:6px 0; color:#F59E0B;">29.4</td>
-                            <td style="padding:6px 0; font-weight:500; color:#F59E0B;">Borderline Shift</td>
-                        </tr>
-                    </table>
-                    <div style="margin-top:14px; padding:10px; background-color:#F8FAFC; border-left:3px solid #0284C7; border-radius:4px;">
-                        <b style="font-size:11px; text-transform:uppercase; color:#0284C7;">Nested System Recommendation Action:</b><br>
-                        <span style="color:#334155; font-size:12px;">Initiate intensive secondary screening sequence logs for cardiovascular tracking pipelines immediately.</span>
-                    </div>
+        fig1 = px.scatter(
+            df, x="Age", y="FBS", color="Stage",
+            color_discrete_map={'Diabetes Mellitus': '#F43F5E', 'Normal': '#10B981', 'Prediabetes': '#F59E0B'}
+        )
+        
+        # FIXED SIZE: Scale parameters calibrated to match clean presentation requirements
+        fig1.update_layout(
+            height=240,
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            margin=dict(l=10, r=10, t=5, b=10),
+            font=dict(family="Plus Jakarta Sans", size=10, color="#94A3B8"),
+            xaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="Age Layer"),
+            yaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="FBS Glucose"),
+            showlegend=False
+        )
+        st.plotly_chart(fig1, use_container_width=True, config={'displayModeBar': False})
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+    with r:
+        st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:10px;'>Sex Categorization Breakdown Vector</h6>", unsafe_allow_html=True)
+        
+        m_total = len(df[df["Gender"] == "Male"])
+        f_total = len(df[df["Gender"] == "Female"])
+        
+        fig2 = go.Figure()
+        fig2.add_trace(go.Pie(
+            labels=["Male", "Female"],
+            values=[m_total, f_total],
+            hole=0.70,
+            marker=dict(colors=['#0284C7', '#E11D48']),
+            textinfo='percent'
+        ))
+        
+        # FIXED SIZE: Condensed dimensions
+        fig2.update_layout(
+            height=240,
+            margin=dict(t=5, b=5, l=10, r=10), 
+            paper_bgcolor="rgba(0,0,0,0)",
+            font=dict(family="Plus Jakarta Sans", size=10, color="#FFFFFF"),
+            showlegend=True,
+            legend=dict(orientation="v", yanchor="middle", y=0.5, xanchor="left", x=1.0)
+        )
+        st.plotly_chart(fig2, use_container_width=True, config={'displayModeBar': False})
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    lower_left, lower_right = st.columns([1.3, 1.2])
+    with lower_left:
+        st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:10px;'>Complication Risk Level Timeline Stacks</h6>", unsafe_allow_html=True)
+        
+        age_brackets = ["30s", "40s", "50s", "60s", "70s+"]
+        fig3 = go.Figure(data=[
+            go.Bar(name='Low Strain', x=age_brackets, y=[30, 24, 40, 35, 20], marker_color='#0284C7'),
+            go.Bar(name='Medium Variant', x=age_brackets, y=[15, 18, 28, 42, 30], marker_color='#F59E0B'),
+            go.Bar(name='High Risk Alert', x=age_brackets, y=[8, 14, 21, 29, 45], marker_color='#EF4444')
+        ])
+        
+        # FIXED SIZE: Scaled cleanly
+        fig3.update_layout(
+            barmode='stack', height=240,
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            margin=dict(l=10, r=10, t=5, b=10),
+            font=dict(family="Plus Jakarta Sans", size=10, color="#94A3B8"),
+            xaxis=dict(gridcolor="#1E293B", title="Cohort"),
+            yaxis=dict(gridcolor="#1E293B", title="Probability %"),
+            showlegend=False
+        )
+        st.plotly_chart(fig3, use_container_width=True, config={'displayModeBar': False})
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+    with lower_right:
+        st.markdown("""
+            <div class="custom-report-view">
+                <h4 style="margin-top:0; font-weight:800; font-size:15px; margin-bottom:4px;">P001 Analytical Engine Evaluation Result</h4>
+                <p style="font-size:11px; color:#64748B !important; margin-bottom:8px;"><b>Master Timestamp:</b> 2026-05-19 Operational Log</p>
+                <table style="width:100%; text-align:left; border-collapse: collapse; font-size:11px; line-height:1.4;">
+                    <tr style="border-bottom: 1px solid #E2E8F0; color:#64748B;">
+                        <th style="padding:4px 0;">Metric Profile</th>
+                        <th style="padding:4px 0;">Value</th>
+                        <th style="padding:4px 0;">Status</th>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding:4px 0; font-weight:600;">HbA1c Count %</td>
+                        <td style="padding:4px 0; color:#EF4444;">8.4 %</td>
+                        <td style="padding:4px 0; color:#EF4444;">Critical Deviation</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #F1F5F9;">
+                        <td style="padding:4px 0; font-weight:600;">FBS Glucose</td>
+                        <td style="padding:4px 0; color:#EF4444;">164 mg/dL</td>
+                        <td style="padding:4px 0; color:#EF4444;">Critical Deviation</td>
+                    </tr>
+                </table>
+                <div style="margin-top:8px; padding:8px; background-color:#F8FAFC; border-left:3px solid #0284C7; border-radius:4px; font-size:11px;">
+                    <span style="color:#334155;">Initiate intensive screening sequence logs for tracking pipelines immediately.</span>
                 </div>
-            """, unsafe_allow_html=True)
+            </div>
+        """, unsafe_allow_html=True)
 
 # ================= MODULE 6: CONSULTATION MATRIX =================
 elif menu == "Consultation Matrix":
