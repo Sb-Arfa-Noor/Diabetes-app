@@ -16,7 +16,7 @@ model3 = joblib.load("st/ml_models/step3.pkl")
 
 # ================= PAGE CONFIG =================
 st.set_page_config(
-    page_title="DiabetesCare AI Portal",
+    page_title="DiabetesCare AI Corporate Portal",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -41,124 +41,164 @@ if "patients" not in st.session_state:
 if "patient_data" not in st.session_state:
     st.session_state.patient_data = {}
 
-# ================= HIGH-CONTRAST PROFESSIONAL CSS STYLING =================
+# ================= PREMIUM EXECUTIVE DARK BLUE CSS STYLING =================
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     
-    /* Global Container Theme */
+    /* Core Application Framework Theme */
     .stApp {
-        background-color: #F8FAFC;
-        font-family: 'Inter', sans-serif;
+        background-color: #0B0F19; /* Executive Deep Dark Blue Space */
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
     
-    /* High Contrast Text Readability Global Rules */
-    h1, h2, h3, h4, h5, h6, p, span, label {
-        color: #0F172A !important;  /* Deep Slate Charcoal for Maximum Contrast */
+    /* Strict Typography Controls Override */
+    h1, h2, h3, h4, h5, h6, p, label, span, div {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
     
-    /* Sidebar Specific Contrast Overrides */
+    /* Main Streamlit Core Overrides */
+    div[data-testid="stWidgetLabel"] p {
+        color: #94A3B8 !important; /* Soft Silver Blue for Inputs */
+        font-weight: 500 !important;
+        font-size: 13px !important;
+        letter-spacing: 0.2px;
+    }
+    
+    .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] {
+        background-color: #111827 !important;
+        color: #F8FAFC !important;
+        border: 1px solid #1F2937 !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+    }
+    
+    /* Premium Sidebar UI Architecture */
     section[data-testid="stSidebar"] {
-        background-color: #0F172A !important;
-        border-right: 1px solid #1E293B;
-    }
-    section[data-testid="stSidebar"] h2, 
-    section[data-testid="stSidebar"] div, 
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] span,
-    section[data-testid="stSidebar"] label {
-        color: #E2E8F0 !important;  /* Crisp Off-White/Light Silver for Dark Sidebar */
+        background-color: #090D16 !important;
+        border-right: 1px solid #1E293B !important;
+        padding-top: 10px;
     }
     
-    /* Clean Professional Login Layout Card */
-    .auth-container-box {
-        background: #FFFFFF;
-        padding: 40px;
+    /* Custom Sidebar Radio Element Styling Hack */
+    div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label {
+        background-color: #111827 !important;
+        border: 1px solid #1F2937 !important;
+        padding: 12px 16px !important;
+        border-radius: 8px !important;
+        margin-bottom: 8px !important;
+        transition: all 0.25s ease-in-out;
+        width: 100%;
+    }
+    div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label:hover {
+        border-color: #38BDF8 !important; /* Premium Cyan Light Accent */
+        background-color: #1E293B !important;
+    }
+    div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label[data-checked="true"] {
+        background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+        border-color: #38BDF8 !important;
+    }
+    div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label p {
+        color: #E2E8F0 !important;
+        font-weight: 500 !important;
+        font-size: 14px !important;
+    }
+    
+    /* Clean Premium Layout Cards */
+    .panel-card-container {
+        background: #111C44; /* Image Matching Classic Deep Navy Blue */
+        padding: 28px;
         border-radius: 12px;
-        box-shadow: 0 4px 30px rgba(15, 23, 42, 0.04);
-        border: 1px solid #E2E8F0;
-        margin-top: 35px;
+        border: 1px solid #1E293B;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        margin-bottom: 24px;
+    }
+    
+    /* Premium Title Headers Layout */
+    .main-title-view {
+        font-size: 32px;
+        font-weight: 800;
+        color: #F8FAFC !important;
+        letter-spacing: -0.75px;
+        margin-bottom: 4px;
+    }
+    .sub-title-view {
+        font-size: 14px;
+        color: #38BDF8 !important; /* Neon Electric Blue Secondary Tint */
+        font-weight: 500;
+        margin-bottom: 30px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* High-End Clean Metric Node Structure */
+    .metric-node-box {
+        background: #111C44;
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid #1E293B;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .metric-node-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #94A3B8 !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .metric-node-value {
+        font-size: 32px;
+        font-weight: 800;
+        color: #FFFFFF !important;
+        margin-top: 6px;
+    }
+    
+    /* Authentic Clean Login Box Layout */
+    .auth-container-box {
+        background: #111C44;
+        padding: 45px;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        border: 1px solid #1E293B;
+        margin-top: 40px;
     }
     .auth-header-main {
-        font-size: 26px;
-        font-weight: 700;
-        color: #0F172A !important;
+        font-size: 28px;
+        font-weight: 800;
+        color: #FFFFFF !important;
         text-align: center;
         letter-spacing: -0.5px;
     }
     .auth-header-sub {
         font-size: 13px;
-        color: #64748B !important;
+        color: #94A3B8 !important;
         text-align: center;
-        margin-top: 6px;
-        margin-bottom: 25px;
+        margin-top: 8px;
+        margin-bottom: 30px;
     }
     
-    /* Clean Grid Cards and Form Layout Elements */
-    .panel-card-container {
-        background: #FFFFFF;
-        padding: 25px;
-        border-radius: 10px;
-        border: 1px solid #E2E8F0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.01);
-        margin-bottom: 20px;
-    }
-    
-    /* Structural Section Typography Layouts */
-    .main-title-view {
-        font-size: 28px;
-        font-weight: 700;
-        color: #0F172A !important;
-        letter-spacing: -0.5px;
-        margin-bottom: 2px;
-    }
-    .sub-title-view {
-        font-size: 14px;
-        color: #64748B !important;
-        margin-bottom: 25px;
-    }
-    
-    /* High-End Clean Metric Layout Structures */
-    .metric-node-box {
-        background: #FFFFFF;
-        padding: 24px;
-        border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-    }
-    .metric-node-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: #64748B !important;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .metric-node-value {
-        font-size: 28px;
-        font-weight: 700;
-        color: #0F172A !important;
-        margin-top: 6px;
-    }
-    
-    /* Structured Button Platform Overrides */
+    /* Custom High Contrast Core System Buttons */
     .stButton>button {
-        background-color: #0F766E !important; /* Premium Dark Teal */
+        background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%) !important; /* High Grade Electric Cyan-Blue Gradient */
         color: #FFFFFF !important;
-        border-radius: 6px !important;
-        padding: 10px 24px !important;
-        font-weight: 500 !important;
+        border-radius: 8px !important;
+        padding: 12px 28px !important;
+        font-weight: 600 !important;
         font-size: 14px !important;
         border: none !important;
-        transition: all 0.2s ease-in-out !important;
+        box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2) !important;
+        transition: all 0.25s ease-in-out !important;
     }
     .stButton>button:hover {
-        background-color: #115E59 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
     }
     
-    /* Input Labels Readability Fix */
-    div[data-testid="stWidgetLabel"] p {
-        color: #334155 !important;
-        font-weight: 500 !important;
+    /* Streamlit Interactive Dataframe Custom Dark Theme Polish */
+    div[data-testid="stDataFrame"] {
+        border: 1px solid #1E293B !important;
+        border-radius: 8px !important;
+        overflow: hidden;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -170,88 +210,89 @@ if not st.session_state.logged_in:
     gutter_left, center_auth, gutter_right = st.columns([1.1, 1.2, 1.1])
     
     with center_auth:
-        # SIGN IN COMPONENT
+        # SIGN IN MODULE FRAMEWORK
         if st.session_state.auth_screen == "login":
             st.markdown("""
                 <div class='auth-container-box'>
                     <div class='auth-header-main'>Clinical Portal Access</div>
-                    <div class='auth-header-sub'>Enter administrative account keys or use admin default account</div>
+                    <div class='auth-header-sub'>Secure Administrative Dashboard Identity Validation Keys</div>
                 </div>
             """, unsafe_allow_html=True)
             
-            login_user = st.text_input("Username", placeholder="e.g. admin", key="txt_login_user")
-            login_pass = st.text_input("Password", type="password", placeholder="Enter account password", key="txt_login_pass")
+            login_user = st.text_input("Username Identifier", placeholder="e.g. admin", key="txt_login_user")
+            login_pass = st.text_input("Security Access Code", type="password", placeholder="••••••••", key="txt_login_pass")
             
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("Sign In to System", use_container_width=True):
+            if st.button("Sign In to Corporate Workspace", use_container_width=True):
                 if login_user in st.session_state.auth_registry and st.session_state.auth_registry[login_user] == login_pass:
                     st.session_state.logged_in = True
                     st.rerun()
                 else:
-                    st.error("Access denied. Invalid credentials parameter.")
+                    st.error("Authentication Error: Invalid identity or credential sequence token.")
             
-            st.markdown("<p style='text-align:center; font-size:13px; color:#64748B; margin-top:20px;'>Need a separate clinical account?</p>", unsafe_allow_html=True)
-            if st.button("Create Practitioner Account", use_container_width=True):
+            st.markdown("<p style='text-align:center; font-size:13px; color:#94A3B8; margin-top:25px;'>Need a separate clinical account?</p>", unsafe_allow_html=True)
+            if st.button("Create Practitioner Account Layer", use_container_width=True):
                 st.session_state.auth_screen = "register"
                 st.rerun()
                 
-        # SIGN UP COMPONENT
+        # SIGN UP MODULE FRAMEWORK
         elif st.session_state.auth_screen == "register":
             st.markdown("""
                 <div class='auth-container-box'>
-                    <div class='auth-header-main'>Practitioner Registration</div>
-                    <div class='auth-header-sub'>Structure new valid security credentials into active portal memory</div>
+                    <div class='auth-header-main'>Register Practitioner</div>
+                    <div class='auth-header-sub'>Structure new active clinical access parameters into secure framework</div>
                 </div>
             """, unsafe_allow_html=True)
             
-            reg_user = st.text_input("Choose Username", placeholder="e.g. dr_fatima", key="txt_reg_user")
-            reg_pass = st.text_input("Choose Password", type="password", placeholder="Set secure password", key="txt_reg_pass")
-            reg_conf = st.text_input("Confirm Password", type="password", placeholder="Re-type password", key="txt_reg_conf")
+            reg_user = st.text_input("Choose Username Token", placeholder="e.g. dr_fatima", key="txt_reg_user")
+            reg_pass = st.text_input("Choose Security Password", type="password", placeholder="••••••••", key="txt_reg_pass")
+            reg_conf = st.text_input("Confirm Security Password", type="password", placeholder="••••••••", key="txt_reg_conf")
             
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("Register Account", use_container_width=True):
+            if st.button("Compile & Register Credentials", use_container_width=True):
                 if not reg_user.strip() or not reg_pass.strip():
-                    st.error("Please fill all required operational entry structures.")
+                    st.error("Input Violation: Fields cannot be left null.")
                 elif reg_user in st.session_state.auth_registry:
-                    st.error("This target user identification token is already logged.")
+                    st.error("Identity Collision: Target username token is already structured.")
                 elif reg_pass != reg_conf:
-                    st.error("Configurations mismatch. Passwords must be perfectly equivalent.")
+                    st.error("Verification Mismatch: Passwords must be completely identical.")
                 else:
                     st.session_state.auth_registry[reg_user] = reg_pass
-                    st.success("Registration complete! You can now sign in using these keys.")
+                    st.success("Registration Successful! Proceeding to initialization layer.")
                     st.session_state.auth_screen = "login"
                     st.rerun()
             
-            st.markdown("<p style='text-align:center; font-size:13px; color:#64748B; margin-top:20px;'>Already have access keys?</p>", unsafe_allow_html=True)
-            if st.button("Return to Sign In Panel", use_container_width=True):
+            st.markdown("<p style='text-align:center; font-size:13px; color:#94A3B8; margin-top:25px;'>Already registered inside active portal?</p>", unsafe_allow_html=True)
+            if st.button("Return to System Login", use_container_width=True):
                 st.session_state.auth_screen = "login"
                 st.rerun()
     st.stop()
 
 # ================= CORPORATE NAVIGATION MENU =================
 st.sidebar.markdown("""
-<div style='padding: 20px 8px 10px 8px;'>
-    <div style='color: #F8FAFC; font-weight: 700; font-size:22px; letter-spacing:-0.5px;'>DiabetesCare AI</div>
-    <div style='color: #94A3B8; font-size: 12px; margin-top: 2px; font-weight:500;'>Clinical Management Architecture</div>
+<div style='padding: 24px 12px 16px 12px;'>
+    <div style='color: #FFFFFF; font-weight: 800; font-size:24px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
+    <div style='color: #38BDF8; font-size: 11px; margin-top: 4px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
 </div>
-<hr style='border-color: #1E293B; margin-top: 0px; margin-bottom:15px;'>
+<hr style='border-color: #1E293B; margin-top: 0px; margin-bottom:20px;'>
 """, unsafe_allow_html=True)
 
 menu = st.sidebar.radio(
-    "Navigation System",
-    ["Dashboard Overview", "Patients Matrix Registry", "Diagnostic Pipeline", "Data Report Center", "Visual Analytics Node", "Consultation Matrix"]
+    "NAVIGATION NODE",
+    ["Dashboard Overview", "Patients Matrix Registry", "Diagnostic Pipeline", "Data Report Center", "Visual Analytics Node", "Consultation Matrix"],
+    label_visibility="collapsed"
 )
 
 st.sidebar.markdown("<br><br><hr style='border-color: #1E293B;'>", unsafe_allow_html=True)
-if st.sidebar.button("Log Out System Workspace", use_container_width=True):
+if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
     st.session_state.logged_in = False
     st.session_state.auth_screen = "login"
     st.rerun()
 
-# ================= MENU 1: DASHBOARD OVERVIEW =================
+# ================= MODULE 1: DASHBOARD OVERVIEW =================
 if menu == "Dashboard Overview":
-    st.markdown('<div class="main-title-view">System Dashboard</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Overview of current registered clinical database records</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
     
     total = len(st.session_state.patients)
     positive = len([p for p in st.session_state.patients if p.get("Stage") == "Diabetes Mellitus"])
@@ -259,16 +300,16 @@ if menu == "Dashboard Overview":
     normal = total - positive - risk
     
     c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown(f'<div class="metric-node-box" style="border-top: 4px solid #0F766E;"><div class="metric-node-label">Total Logs Managed</div><div class="metric-node-value">{total}</div></div>', unsafe_allow_html=True)
-    with c2: st.markdown(f'<div class="metric-node-box" style="border-top: 4px solid #DC2626;"><div class="metric-node-label">Confirmed Positive Cases</div><div class="metric-node-value">{positive}</div></div>', unsafe_allow_html=True)
-    with c3: st.markdown(f'<div class="metric-node-box" style="border-top: 4px solid #D97706;"><div class="metric-node-label">Prediabetes Metrics Risk</div><div class="metric-node-value">{risk}</div></div>', unsafe_allow_html=True)
-    with c4: st.markdown(f'<div class="metric-node-box" style="border-top: 4px solid #0D9488;"><div class="metric-node-label">Normal Physiological Status</div><div class="metric-node-value">{normal}</div></div>', unsafe_allow_html=True)
+    with c1: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #38BDF8;"><div class="metric-node-label">Total Logs Managed</div><div class="metric-node-value">{total}</div></div>', unsafe_allow_html=True)
+    with c2: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #F43F5E;"><div class="metric-node-label">Positive Instances</div><div class="metric-node-value">{positive}</div></div>', unsafe_allow_html=True)
+    with c3: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #F59E0B;"><div class="metric-node-label">Prediabetes Risk</div><div class="metric-node-value">{risk}</div></div>', unsafe_allow_html=True)
+    with c4: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #10B981;"><div class="metric-node-label">Normal Physiological</div><div class="metric-node-value">{normal}</div></div>', unsafe_allow_html=True)
         
     st.write("<br>", unsafe_allow_html=True)
     col1, col2 = st.columns([1.5, 1])
     
     with col1:
-        st.markdown("##### Recent Integrated Case Records")
+        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Recent Integrated Case Records</h5>", unsafe_allow_html=True)
         if st.session_state.patients:
             df = pd.DataFrame(st.session_state.patients).fillna("N/A")
             st.dataframe(
@@ -277,27 +318,27 @@ if menu == "Dashboard Overview":
                 hide_index=True
             )
         else:
-            st.info("No cases currently recorded within storage frameworks.")
+            st.info("System Tracking Status: Data structures currently unpopulated.")
             
     with col2:
-        st.markdown("##### Population Density Proportions")
+        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Population Density Proportions</h5>", unsafe_allow_html=True)
         fig = go.Figure(data=[go.Pie(
             labels=["Diabetes Mellitus", "Normal Status", "Prediabetes Risk"], 
             values=[positive, normal, risk], 
-            hole=.60, 
-            marker=dict(colors=['#DC2626', '#0D9488', '#D97706']),
-            textinfo='percent'
+            hole=.62, 
+            marker=dict(colors=['#F43F5E', '#10B981', '#F59E0B']),
+            textinfo='percent+label'
         )])
         fig.update_layout(
             height=280, 
             margin=dict(l=10, r=10, t=10, b=10), 
-            showlegend=True, 
+            showlegend=False, 
             paper_bgcolor="rgba(0,0,0,0)",
-            legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5)
+            font=dict(family="Plus Jakarta Sans", color="#FFFFFF")
         )
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
-# ================= MENU 2: DIAGNOSTIC PIPELINE =================
+# ================= MODULE 2: DIAGNOSTIC PIPELINE =================
 elif menu == "Diagnostic Pipeline":
     if "step" not in st.session_state:
         st.session_state.step = 1
@@ -306,7 +347,7 @@ elif menu == "Diagnostic Pipeline":
     st.markdown(f'<div class="sub-title-view">Multi-stage analytics system pipeline — <b>Active Phase Frame {st.session_state.step} of 3</b></div>', unsafe_allow_html=True)
     
     if st.session_state.step == 1:
-        st.markdown("<div class='panel-card-container'><h5>Phase 1: Entry Demographics & Direct Laboratory Glycemic Markers</h5><br>", unsafe_allow_html=True)
+        st.markdown("<div class='panel-card-container'><h4 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Phase 1: Entry Demographics & Direct Laboratory Glycemic Markers</h4><br>", unsafe_allow_html=True)
         l, r = st.columns(2)
         with l:
             name = st.text_input("Patient Full Identity Name Sequence", placeholder="Enter legal text name string")
@@ -322,7 +363,7 @@ elif menu == "Diagnostic Pipeline":
         
         if st.button("Process Initial Metrics Framework"):
             if not name.strip():
-                st.error("Constraint violated: Patient legal identity text vector must be structured.")
+                st.error("Constraint violated: Patient identity token vector cannot be structural null.")
             else:
                 stage = "Normal"
                 if hba1c >= 6.5 or fbs >= 126 or gtt >= 200: stage = "Diabetes Mellitus"
@@ -347,7 +388,7 @@ elif menu == "Diagnostic Pipeline":
                 st.rerun()
 
     elif st.session_state.step == 2:
-        st.markdown("<div class='panel-card-container'><h5>Phase 2: Etiological Isolation Panels & Pancreatic Endocrine Assays</h5><br>", unsafe_allow_html=True)
+        st.markdown("<div class='panel-card-container'><h4 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Phase 2: Etiological Isolation Panels & Pancreatic Endocrine Assays</h4><br>", unsafe_allow_html=True)
         l, r = st.columns(2)
         with l:
             pregnant = st.selectbox("Gestational Pregnancy Status Framework", [0, 1])
@@ -381,17 +422,17 @@ elif menu == "Diagnostic Pipeline":
                 st.rerun()
 
     elif st.session_state.step == 3:
-        st.markdown("<div class='panel-card-container'><h5>Phase 3: Pipeline Output Diagnostic Struct Analysis</h5>", unsafe_allow_html=True)
+        st.markdown("<div class='panel-card-container'><h4 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Phase 3: Pipeline Output Diagnostic Struct Analysis</h4>", unsafe_allow_html=True)
         p = st.session_state.patient_data
         
         st.markdown(f"""
-            <div style="background-color: #FFFFFF; padding: 22px; border-radius: 6px; border: 1px solid #E2E8F0;">
-                <h5 style="color: #0F766E !important; margin-top: 0; font-weight:700;">Diagnostic Engine Analytics Evaluation Result</h5>
-                <hr style="margin: 12px 0; border-color:#E2E8F0;">
-                <p style="margin: 6px 0; font-size:14px; color:#1E293B !important;"><b>Identity Label Reference:</b> {p.get('Name')}</p>
-                <p style="margin: 6px 0; font-size:14px; color:#1E293B !important;"><b>Physiological Vectors:</b> {p.get('Age')} Years | {p.get('Gender')}</p>
-                <p style="margin: 6px 0; font-size:14px; color:#1E293B !important;"><b>Glycemic Level State Map:</b> <span style="color: #DC2626 !important; font-weight: 700;">{p.get('Stage')}</span></p>
-                <p style="margin: 6px 0; font-size:14px; color:#1E293B !important;"><b>Isolated Secondary Strain Subtype:</b> {p.get('Type', 'N/A')}</p>
+            <div style="background-color: #111827; padding: 24px; border-radius: 8px; border: 1px solid #1E293B;">
+                <h5 style="color: #38BDF8 !important; margin-top: 0; font-weight:800; font-size:18px;">Diagnostic Engine Analytics Evaluation Result</h5>
+                <hr style="margin: 14px 0; border-color:#1E293B;">
+                <p style="margin: 8px 0; font-size:14px; color:#F8FAFC !important;"><b>Identity Label Reference:</b> {p.get('Name')}</p>
+                <p style="margin: 8px 0; font-size:14px; color:#F8FAFC !important;"><b>Physiological Vectors:</b> {p.get('Age')} Years | {p.get('Gender')}</p>
+                <p style="margin: 8px 0; font-size:14px; color:#F8FAFC !important;"><b>Glycemic Level State Map:</b> <span style="color: #F43F5E !important; font-weight: 700;">{p.get('Stage')}</span></p>
+                <p style="margin: 8px 0; font-size:14px; color:#F8FAFC !important;"><b>Isolated Secondary Strain Subtype:</b> {p.get('Type', 'N/A')}</p>
             </div>
         """, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -403,14 +444,14 @@ elif menu == "Diagnostic Pipeline":
                 p["Date"] = datetime.now().strftime("%Y-%m-%d")
                 add_patient(p)
                 st.session_state.patients = get_patients()
-                st.success("Log status successfully pushed to permanent cluster variables.")
+                st.success("Log status successfully pushed to cloud cluster structures.")
                 
         if st.button("Initialize Fresh Pipeline Tracking Framework", use_container_width=True):
             st.session_state.step = 1
             st.session_state.patient_data = {}
             st.rerun()
 
-# ================= MENU 3: PATIENTS MATRIX REGISTRY =================
+# ================= MODULE 3: PATIENTS MATRIX REGISTRY =================
 elif menu == "Patients Matrix Registry":
     st.markdown('<div class="main-title-view">Electronic Health Ledger Database</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title-view">Registry control layers and transactional data table frames</div>', unsafe_allow_html=True)
@@ -428,7 +469,7 @@ elif menu == "Patients Matrix Registry":
         )
         
         st.write("<br><br>", unsafe_allow_html=True)
-        st.markdown("<div class='panel-card-container'><h5>Administrative System Modification Module</h5>", unsafe_allow_html=True)
+        st.markdown("<div class='panel-card-container'><h5 style='color:#FFFFFF; font-weight:700; margin-top:0;'>Administrative System Modification Module</h5>", unsafe_allow_html=True)
         del_target = st.text_input("Target Row Unique ID Reference Sequence to Drop (e.g. P1)", placeholder="Enter row identity mapping sequence...")
         if st.button("Purge Database Entity Frame"):
             if del_target:
@@ -440,7 +481,7 @@ elif menu == "Patients Matrix Registry":
     else:
         st.info("No compiled metrics logged inside storage records matrix lines.")
 
-# ================= MENU 4: DATA REPORT CENTER =================
+# ================= MODULE 4: DATA REPORT CENTER =================
 elif menu == "Data Report Center":
     st.markdown('<div class="main-title-view">Documentation Export Matrices</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title-view">Download formal plain-text electronic verification logs</div>', unsafe_allow_html=True)
@@ -449,12 +490,11 @@ elif menu == "Data Report Center":
         df_rep = pd.DataFrame(st.session_state.patients).fillna("N/A")
         st.markdown("<div class='panel-card-container'>", unsafe_allow_html=True)
         
-        # Display as highly polished layout rows
         for idx, row in df_rep.iterrows():
             c = st.columns([1, 3, 2, 2])
-            c[0].markdown(f"<span style='color:#475569; font-weight:600;'>{row.get('ID')}</span>", unsafe_allow_html=True)
-            c[1].markdown(f"<span style='color:#0F172A; font-weight:500;'>{row.get('Name')}</span>", unsafe_allow_html=True)
-            c[2].markdown(f"<span style='color:#0F766E;'>{row.get('Stage')}</span>", unsafe_allow_html=True)
+            c[0].markdown(f"<span style='color:#94A3B8; font-weight:600;'>{row.get('ID')}</span>", unsafe_allow_html=True)
+            c[1].markdown(f"<span style='color:#FFFFFF; font-weight:500;'>{row.get('Name')}</span>", unsafe_allow_html=True)
+            c[2].markdown(f"<span style='color:#38BDF8;'>{row.get('Stage')}</span>", unsafe_allow_html=True)
             
             report_body = f"DIABETESCARE AI DIAGNOSTIC REPORT\n=================================\nID: {row.get('ID')}\nPatient Name: {row.get('Name')}\nDiagnosis Stage: {row.get('Stage')}\nClassification Sub-type: {row.get('Type', 'N/A')}\nTimestamp: {datetime.now().strftime('%Y-%m-%d')}"
             c[3].download_button("Export Plain Text Log", data=report_body, file_name=f"EHR_Report_{row.get('Name')}.txt", key=f"btn_{idx}")
@@ -462,45 +502,47 @@ elif menu == "Data Report Center":
     else:
         st.info("No file object generation arrays detected in data nodes.")
 
-# ================= MENU 5: VISUAL ANALYTICS NODE =================
+# ================= MODULE 5: VISUAL ANALYTICS NODE =================
 elif menu == "Visual Analytics Node":
     st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title-view">Epidemiological variable mapping layouts</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
     
     if st.session_state.patients:
         df = pd.DataFrame(st.session_state.patients)
         l, r = st.columns(2)
         
         with l:
-            st.markdown("<div class='panel-card-container'><h6>Fasting Blood Sugar (FBS) vs Patient Age Distribution</h6>", unsafe_allow_html=True)
+            st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Fasting Blood Sugar (FBS) vs Patient Age Distribution</h6>", unsafe_allow_html=True)
             fig1 = px.scatter(
                 df, x="Age", y="FBS", color="Stage",
-                color_discrete_map={'Diabetes Mellitus': '#DC2626', 'Normal': '#0D9488', 'Prediabetes': '#D97706'},
-                template="simple_white"
+                color_discrete_map={'Diabetes Mellitus': '#F43F5E', 'Normal': '#10B981', 'Prediabetes': '#F59E0B'}
             )
             fig1.update_layout(
                 paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                margin=dict(l=20, r=20, t=20, b=20),
-                font=dict(family="Inter", size=12, color="#1E293B")
+                margin=dict(l=20, r=20, t=10, b=20),
+                font=dict(family="Plus Jakarta Sans", size=12, color="#94A3B8"),
+                xaxis=dict(gridcolor="#1F2937", zerolinecolor="#1F2937"),
+                yaxis=dict(gridcolor="#1F2937", zerolinecolor="#1F2937")
             )
             st.plotly_chart(fig1, use_container_width=True, config={'displayModeBar': False})
             st.markdown("</div>", unsafe_allow_html=True)
             
         with r:
-            st.markdown("<div class='panel-card-container'><h6>Sex Categorization Breakdown Vector</h6>", unsafe_allow_html=True)
+            st.markdown("<div class='panel-card-container'><h6 style='color:#FFFFFF; font-weight:700; margin-top:0; margin-bottom:15px;'>Sex Categorization Breakdown Vector</h6>", unsafe_allow_html=True)
             m_size = len(df[df["Gender"] == "Male"])
             f_size = len(df[df["Gender"] == "Female"])
             fig2 = go.Figure(data=[go.Pie(
-                labels=["Male Configuration", "Female Configuration"], 
+                labels=["Male Config", "Female Config"], 
                 values=[m_size, f_size], 
-                hole=0.55, 
-                marker=dict(colors=['#0F766E','#BE123C']),
-                textinfo='value'
+                hole=0.60, 
+                marker=dict(colors=['#0284C7','#E11D48']),
+                textinfo='value+percent'
             )])
             fig2.update_layout(
-                margin=dict(t=20, b=20, l=20, r=20), 
+                margin=dict(t=10, b=10, l=10, r=10), 
                 paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter", size=12, color="#1E293B"),
+                font=dict(family="Plus Jakarta Sans", size=12, color="#FFFFFF"),
+                showlegend=True,
                 legend=dict(orientation="h", yanchor="bottom", y=-0.15, xanchor="center", x=0.5)
             )
             st.plotly_chart(fig2, use_container_width=True, config={'displayModeBar': False})
@@ -508,7 +550,7 @@ elif menu == "Visual Analytics Node":
     else:
         st.info("Laboratory graphs are frozen until system values populate memory arrays.")
 
-# ================= MENU 6: CONSULTATION MATRIX =================
+# ================= MODULE 6: CONSULTATION MATRIX =================
 elif menu == "Consultation Matrix":
     st.markdown('<div class="main-title-view">Clinical Allocation Matrix Grid</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title-view">Time logs tracking operational consultation scheduling blocks</div>', unsafe_allow_html=True)
