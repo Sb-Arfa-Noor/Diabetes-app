@@ -33,7 +33,7 @@ if "auth_screen" not in st.session_state:
 
 if "auth_registry" not in st.session_state:
     st.session_state.auth_registry = {
-        "admin": "password"  # Core Master Admin Account
+        "admin": "password"
     }
 
 if "patients" not in st.session_state:
@@ -42,6 +42,10 @@ if "patients" not in st.session_state:
 if "patient_data" not in st.session_state:
     st.session_state.patient_data = {}
 
+# Navigation state for sidebar window management
+if "sidebar_collapsed" not in st.session_state:
+    st.session_state.sidebar_collapsed = False
+
 # ================= PREMIUM EXECUTIVE DARK BLUE CSS STYLING =================
 st.markdown("""
 <style>
@@ -49,40 +53,18 @@ st.markdown("""
     
     /* Core Application Framework Theme */
     .stApp {
-        background-color: #0B0F19; /* Executive Deep Dark Blue Space */
+        background-color: #0B0F19;
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
     
-    /* Target only custom typography elements, strictly EXCLUDING native material icons to prevent glitch text */
-    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp p, .stApp label, .stApp .panel-card-container, .stApp .main-title-view, .stApp .sub-title-view {
+    /* Typography Controls Override */
+    h1, h2, h3, h4, h5, h6, p, label, span, div {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
-    }
-    
-    /* FIX: Force Native Icon Fonts to render correctly without turning into raw double arrow text */
-    span[data-testid="stIconMaterial"] {
-        font-family: 'Material Icons Sharp' !important;
-        font-size: 20px !important;
-        color: #38BDF8 !important;
-        display: inline-block !important;
-    }
-    
-    /* Premium Native Toggle Button Design & Absolute Alignment */
-    button[data-testid="sidebar-toggle-button"] {
-        background-color: #111C44 !important;
-        border: 1px solid #1E293B !important;
-        border-radius: 6px !important;
-        color: #38BDF8 !important;
-        transition: all 0.2s ease-in-out !important;
-    }
-    button[data-testid="sidebar-toggle-button"]:hover {
-        background-color: #1E293B !important;
-        border-color: #38BDF8 !important;
-        transform: scale(1.05);
     }
     
     /* Main Streamlit Core Overrides */
     div[data-testid="stWidgetLabel"] p {
-        color: #94A3B8 !important; /* Soft Silver Blue for Inputs */
+        color: #94A3B8 !important;
         font-weight: 500 !important;
         font-size: 13px !important;
         letter-spacing: 0.2px;
@@ -100,6 +82,12 @@ st.markdown("""
     section[data-testid="stSidebar"] {
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
+        padding-top: 0px !important;
+    }
+    
+    /* Native Toggle Button Disabler to completely utilize Custom Actions */
+    button[data-testid="sidebar-toggle-button"] {
+        display: none !important;
     }
     
     /* Custom Sidebar Radio Element Styling Hack */
@@ -113,7 +101,7 @@ st.markdown("""
         width: 100%;
     }
     div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label:hover {
-        border-color: #38BDF8 !important; /* Premium Cyan Light Accent */
+        border-color: #38BDF8 !important;
         background-color: #1E293B !important;
     }
     div[data-testid="stSidebarUserContent"] .stRadio div[role="radiogroup"] label[data-checked="true"] {
@@ -128,7 +116,7 @@ st.markdown("""
     
     /* Clean Premium Layout Cards */
     .panel-card-container {
-        background: #111C44; /* Image Matching Classic Deep Navy Blue */
+        background: #111C44;
         padding: 24px;
         border-radius: 12px;
         border: 1px solid #1E293B;
@@ -146,7 +134,7 @@ st.markdown("""
     }
     .sub-title-view {
         font-size: 13px;
-        color: #38BDF8 !important; /* Neon Electric Blue Secondary Tint */
+        color: #38BDF8 !important;
         font-weight: 500;
         margin-bottom: 24px;
         text-transform: uppercase;
@@ -201,7 +189,7 @@ st.markdown("""
     
     /* Custom High Contrast Core System Buttons */
     .stButton>button {
-        background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%) !important; /* High Grade Electric Cyan-Blue Gradient */
+        background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%) !important;
         color: #FFFFFF !important;
         border-radius: 8px !important;
         padding: 10px 24px !important;
@@ -214,6 +202,19 @@ st.markdown("""
     .stButton>button:hover {
         transform: translateY(-1px) !important;
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
+    }
+    
+    /* Micro-Toggle Styles overriding plain streamlit rendering */
+    .arrow-fixed-trigger button {
+        background: #111C44 !important;
+        color: #38BDF8 !important;
+        border: 1px solid #1E293B !important;
+        font-weight: 800 !important;
+        font-size: 18px !important;
+        border-radius: 6px !important;
+        padding: 2px 10px !important;
+        height: 38px !important;
+        width: 42px !important;
     }
     
     /* Streamlit Interactive Dataframe Custom Dark Theme Polish */
@@ -238,6 +239,18 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# ================= INJECT TRIGGER FOR ARROWS INVERSION OVERRIDES =================
+if st.session_state.sidebar_collapsed:
+    st.markdown("""
+        <style>
+            section[data-testid="stSidebar"] {
+                width: 0px !important;
+                min-width: 0px !important;
+                transform: translateX(-350px) !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
 # ================= FUNCTIONAL AUTHENTICATION FLOW =================
 if not st.session_state.logged_in:
@@ -304,13 +317,23 @@ if not st.session_state.logged_in:
 
 # ================= GLOBAL SIDEBAR RENDERING SYSTEM =================
 with st.sidebar:
-    st.markdown("""
-    <div style='padding: 20px 0px 10px 0px;'>
-        <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
-        <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
-    </div>
-    """, unsafe_allow_html=True)
-    st.markdown("<hr style='border-color: #1E293B; margin-top: 0px; margin-bottom:16px;'>", unsafe_allow_html=True)
+    # Absolute alignment for Top-Right close button inside Sidebar window panel context
+    side_col1, side_col2 = st.columns([4, 1])
+    with side_col1:
+        st.markdown("""
+        <div style='padding: 16px 0px 4px 0px;'>
+            <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
+            <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with side_col2:
+        st.markdown('<div class="arrow-fixed-trigger" style="margin-top:20px; text-align:right;">', unsafe_allow_html=True)
+        if st.button("«", key="trigger_close_sb", help="Collapse Navigation Menu"):
+            st.session_state.sidebar_collapsed = True
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    st.markdown("<hr style='border-color: #1E293B; margin-top: 8px; margin-bottom:16px;'>", unsafe_allow_html=True)
     
     menu = st.sidebar.radio(
         "NAVIGATION NODE",
@@ -323,6 +346,19 @@ with st.sidebar:
         st.session_state.logged_in = False
         st.session_state.auth_screen = "login"
         st.rerun()
+
+# ================= TOP ARCHITECTURAL ARROW IF SIDEBAR IS CLOSED =================
+if st.session_state.sidebar_collapsed:
+    # Trigger display at the absolute top-left corner profile frame layout
+    top_col1, top_col2 = st.columns([0.08, 0.92])
+    with top_col1:
+        st.markdown('<div class="arrow-fixed-trigger" style="margin-top:4px;">', unsafe_allow_html=True)
+        if st.button("»", key="trigger_open_sb", help="Expand Navigation Menu"):
+            st.session_state.sidebar_collapsed = False
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    with top_col2:
+        st.write("") # Retain structure tracking layout
 
 # ================= MODULE 1: DASHBOARD OVERVIEW =================
 if menu == "Dashboard Overview":
@@ -345,9 +381,8 @@ if menu == "Dashboard Overview":
     with c4: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #10B981;"><div class="metric-node-label">Normal Physiological</div><div class="metric-node-value">{normal}</div></div>', unsafe_allow_html=True)
         
     st.write("<br>", unsafe_allow_html=True)
+    col1, col2 = st.columns([1.5, 1.0])
     
-    # First Charts Row: Patient Logs + Population Density Donut Chart
-    col1, col2 = st.columns([1.3, 1.1])
     with col1:
         st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Recent Integrated Case Records</h5>", unsafe_allow_html=True)
         if st.session_state.patients:
@@ -356,7 +391,7 @@ if menu == "Dashboard Overview":
                 df[["ID", "Name", "Age", "Gender", "Stage"]], 
                 use_container_width=True, 
                 hide_index=True,
-                height=290
+                height=260
             )
         else:
             mock_table = pd.DataFrame([
@@ -365,15 +400,16 @@ if menu == "Dashboard Overview":
                 {"ID": "P104", "Name": "Mariam Khan", "Age": 29, "Gender": "Female", "Stage": "Normal Status"},
                 {"ID": "P105", "Name": "Bilal Siddiqui", "Age": 52, "Gender": "Male", "Stage": "Diabetes Mellitus"}
             ])
-            st.dataframe(mock_table, use_container_width=True, hide_index=True, height=290)
+            st.dataframe(mock_table, use_container_width=True, hide_index=True, height=260)
             
     with col2:
         st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Population Density Proportions</h5>", unsafe_allow_html=True)
+        
         fig = go.Figure()
         fig.add_trace(go.Pie(
             labels=["Diabetes Mellitus", "Normal Status", "Prediabetes Risk"], 
             values=[positive, normal, risk], 
-            hole=0.6, 
+            hole=0.68, 
             marker=dict(
                 colors=['#F43F5E', '#10B981', '#F59E0B'],
                 line=dict(color='#111C44', width=2)
@@ -381,68 +417,17 @@ if menu == "Dashboard Overview":
             textinfo='percent',
             hoverinfo='label+value+percent'
         ))
+        
+        # FIXED SIZE: Scaled down perfectly to match layout height limits cleanly
         fig.update_layout(
-            height=290, 
-            margin=dict(l=30, r=30, t=50, b=40), 
+            height=260, 
+            margin=dict(l=10, r=10, t=5, b=5), 
             showlegend=True, 
             paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Plus Jakarta Sans", color="#FFFFFF", size=11),
-            legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5)
+            font=dict(family="Plus Jakarta Sans", color="#FFFFFF", size=10),
+            legend=dict(orientation="v", yanchor="middle", y=0.5, xanchor="left", x=1.0)
         )
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-
-    # NEW REQUESTED ADDITION: 2 More Professional Charts for Dashboard Overview
-    st.write("<br>", unsafe_allow_html=True)
-    dash_add1, dash_add2 = st.columns(2)
-    
-    with dash_add1:
-        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Age Bracket Cohort Distribution</h5>", unsafe_allow_html=True)
-        cohort_x = ["<30 Years", "30-45 Years", "46-60 Years", "60+ Years"]
-        cohort_y = [normal + 5, risk + 12, positive + 18, positive + risk]
-        
-        fig_dash1 = go.Figure(data=[
-            go.Bar(
-                x=cohort_x, y=cohort_y,
-                marker_color='#0284C7',
-                bordercolor='#38BDF8',
-                linewidth=1,
-                text=cohort_y,
-                textposition='auto',
-            )
-        ])
-        fig_dash1.update_layout(
-            height=280,
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            margin=dict(l=40, r=40, t=40, b=40),
-            font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
-            xaxis=dict(gridcolor="#1E293B", title="Patient Cohorts"),
-            yaxis=dict(gridcolor="#1E293B", title="Case Counts"),
-        )
-        st.plotly_chart(fig_dash1, use_container_width=True, config={'displayModeBar': False})
-
-    with dash_add2:
-        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Glycemic Load Metrics Framework Analysis</h5>", unsafe_allow_html=True)
-        stages_labels = ["Normal Status", "Prediabetes Risk", "Diabetes Mellitus"]
-        avg_fbs_values = [92, 114, 168]
-        
-        fig_dash2 = go.Figure()
-        fig_dash2.add_trace(go.Scatter(
-            x=stages_labels, y=avg_fbs_values,
-            mode='lines+markers',
-            line=dict(color='#38BDF8', width=3),
-            marker=dict(size=8, color='#FFFFFF', line=dict(color='#0284C7', width=2)),
-            fill='tozeroy',
-            fillcolor='rgba(2, 132, 199, 0.15)'
-        ))
-        fig_dash2.update_layout(
-            height=280,
-            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            margin=dict(l=40, r=40, t=40, b=40),
-            font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
-            xaxis=dict(gridcolor="#1E293B", title="Diagnostic Classes"),
-            yaxis=dict(gridcolor="#1E293B", title="Mean FBS (mg/dL)"),
-        )
-        st.plotly_chart(fig_dash2, use_container_width=True, config={'displayModeBar': False})
 
 # ================= MODULE 2: DIAGNOSTIC PIPELINE =================
 elif menu == "Diagnostic Pipeline":
@@ -638,15 +623,15 @@ elif menu == "Visual Analytics Node":
             color_discrete_map={'Diabetes Mellitus': '#F43F5E', 'Normal': '#10B981', 'Prediabetes': '#F59E0B'}
         )
         
+        # FIXED SIZE: Scale parameters calibrated to match clean presentation requirements
         fig1.update_layout(
-            height=280,
+            height=240,
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            margin=dict(l=40, r=40, t=40, b=40),
-            font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
+            margin=dict(l=10, r=10, t=5, b=10),
+            font=dict(family="Plus Jakarta Sans", size=10, color="#94A3B8"),
             xaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="Age Layer"),
             yaxis=dict(gridcolor="#1E293B", zerolinecolor="#1E293B", title="FBS Glucose"),
-            showlegend=True,
-            legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5)
+            showlegend=False
         )
         st.plotly_chart(fig1, use_container_width=True, config={'displayModeBar': False})
         st.markdown("</div>", unsafe_allow_html=True)
@@ -661,18 +646,19 @@ elif menu == "Visual Analytics Node":
         fig2.add_trace(go.Pie(
             labels=["Male", "Female"],
             values=[m_total, f_total],
-            hole=0.6,
-            marker=dict(colors=['#0284C7', '#E11D48'], line=dict(color='#111C44', width=2)),
+            hole=0.70,
+            marker=dict(colors=['#0284C7', '#E11D48']),
             textinfo='percent'
         ))
         
+        # FIXED SIZE: Condensed dimensions
         fig2.update_layout(
-            height=280,
-            margin=dict(t=50, b=40, l=30, r=30), 
+            height=240,
+            margin=dict(t=5, b=5, l=10, r=10), 
             paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Plus Jakarta Sans", size=11, color="#FFFFFF"),
+            font=dict(family="Plus Jakarta Sans", size=10, color="#FFFFFF"),
             showlegend=True,
-            legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5)
+            legend=dict(orientation="v", yanchor="middle", y=0.5, xanchor="left", x=1.0)
         )
         st.plotly_chart(fig2, use_container_width=True, config={'displayModeBar': False})
         st.markdown("</div>", unsafe_allow_html=True)
@@ -688,15 +674,15 @@ elif menu == "Visual Analytics Node":
             go.Bar(name='High Risk Alert', x=age_brackets, y=[8, 14, 21, 29, 45], marker_color='#EF4444')
         ])
         
+        # FIXED SIZE: Scaled cleanly
         fig3.update_layout(
-            barmode='stack', height=270,
+            barmode='stack', height=240,
             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-            margin=dict(l=40, r=40, t=40, b=40),
-            font=dict(family="Plus Jakarta Sans", size=11, color="#94A3B8"),
-            xaxis=dict(gridcolor="#1E293B", title="Cohort Brackets"),
+            margin=dict(l=10, r=10, t=5, b=10),
+            font=dict(family="Plus Jakarta Sans", size=10, color="#94A3B8"),
+            xaxis=dict(gridcolor="#1E293B", title="Cohort"),
             yaxis=dict(gridcolor="#1E293B", title="Probability %"),
-            showlegend=True,
-            legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5)
+            showlegend=False
         )
         st.plotly_chart(fig3, use_container_width=True, config={'displayModeBar': False})
         st.markdown("</div>", unsafe_allow_html=True)
