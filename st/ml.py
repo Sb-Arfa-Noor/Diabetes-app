@@ -65,29 +65,34 @@ st.markdown("""
         display: none !important;
     }
 
-    /* CRITICAL FIX: Eliminate keyboard hints, native icon textual artifacts and raw ghost labels completely */
-    span[data-testid="stWidgetHint"], 
-    .stButton data-shortcut, 
-    button p span,
-    button[data-testid="baseButton-secondary"] span,
-    div[data-testid="stWidgetLabel"] + div p,
-    section[data-testid="stSidebar"] h1 a,
-    section[data-testid="stSidebar"] [data-testid="stMarkdown"] blockquote {
+    /* THE ULTIMATE ANNIHILATION OF KEYBOARD_DOUBLE_ARROW GLITCH TEXT */
+    /* This completely zero-sizes and vaporizes all hidden native text or material icons */
+    section[data-testid="stSidebar"] button span,
+    section[data-testid="stSidebar"] button p,
+    section[data-testid="stSidebar"] data-shortcut,
+    span[data-testid="stWidgetHint"],
+    .custom-collapse-wrapper button span,
+    .custom-collapse-wrapper button p,
+    button[data-testid="baseButton-secondary"] p,
+    button[data-testid="baseButton-secondary"] span {
         display: none !important;
+        font-size: 0px !important;
+        color: transparent !important;
+        line-height: 0 !important;
         visibility: hidden !important;
         opacity: 0 !important;
         width: 0px !important;
         height: 0px !important;
     }
     
-    /* Absolute suppression of native overlay text glitches like keyboard_double */
-    section[data-testid="stSidebar"] div div div {
-        color: transparent !important;
+    /* Absolute target block override to ensure text never displays inside wrapper buttons */
+    .custom-collapse-wrapper button {
+        color: #38BDF8 !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
-    section[data-testid="stSidebar"] div div div * {
-        color: initial;
-    }
-    
+
     /* Main Streamlit Core Overrides */
     div[data-testid="stWidgetLabel"] p {
         color: #94A3B8 !important;
@@ -366,7 +371,7 @@ else:
     # 1. TOP POSITIONED BUTTON LAYOUT
     side_top_left, side_top_right = st.sidebar.columns([4.0, 1.0])
     with side_top_left:
-        st.write("") # Left gap buffer for precise balancing
+        st.write("") # Gap buffer
     with side_top_right:
         st.markdown("<div class='custom-collapse-wrapper' style='text-align: right; margin-bottom: 5px;'>", unsafe_allow_html=True)
         if st.sidebar.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
@@ -374,11 +379,11 @@ else:
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # 2. HEADERS RENDERED EXACTLY BELOW THE BUTTON
+    # 2. FIXED HEADERS EXACTLY BELOW THE BUTTON WITH WHITE AND BLUE COLOR MATCH
     st.sidebar.markdown("""
     <div style='padding: 0px 4px; margin-bottom: 25px;'>
-        <div style='color: #FFFFFF; font-weight: 800; font-size: 24px; letter-spacing: -0.5px; line-height: 1.2;'>DiabetesCare AI</div>
-        <div style='color: #38BDF8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px; line-height: 1.1;'>Clinical Neural Center</div>
+        <div style='color: #FFFFFF !important; font-weight: 800; font-size: 24px; letter-spacing: -0.5px; line-height: 1.2;'>DiabetesCare AI</div>
+        <div style='color: #38BDF8 !important; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px; line-height: 1.1;'>Clinical Neural Center</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -406,7 +411,6 @@ else:
     st.session_state.current_menu_node = menu
 
 # ================= CORE VIEW CONTENT REGISTRATION =================
-# FIXED POSITION: Header matching top native structure level exactly
 layout_header_left, layout_header_right = st.columns([0.4, 11.6])
 
 with layout_header_left:
