@@ -10,9 +10,9 @@ import joblib
 from database import create_table, get_patients, add_patient, delete_patient
 
 # ================= LOAD ML MODELS =================
-model1 = joblib.load("ml_models/step1.pkl")
-model2 = joblib.load("ml_models/step2.pkl")
-model3 = joblib.load("ml_models/step3.pkl")
+model1 = joblib.load("st/ml_models/step1.pkl")
+model2 = joblib.load("st/ml_models/step2.pkl")
+model3 = joblib.load("st/ml_models/step3.pkl")
 # ================= FEATURE ALIGN HELPER =================
 def align_features(data, model):
     df = pd.DataFrame([data])
