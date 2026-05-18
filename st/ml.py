@@ -28,12 +28,11 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if "auth_screen" not in st.session_state:
-    st.session_state.auth_screen = "login"  # 'login' or 'register'
+    st.session_state.auth_screen = "login"
 
-# In-memory authentication database tracker
 if "auth_registry" not in st.session_state:
     st.session_state.auth_registry = {
-        "admin": "password"  # Core Static Master Admin Account
+        "admin": "password"  # Core Master Admin Account
     }
 
 if "patients" not in st.session_state:
@@ -42,7 +41,7 @@ if "patients" not in st.session_state:
 if "patient_data" not in st.session_state:
     st.session_state.patient_data = {}
 
-# ================= PREMIUM NO-EMOJI DECENT CSS STYLING =================
+# ================= HIGH-CONTRAST PROFESSIONAL CSS STYLING =================
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -51,6 +50,24 @@ st.markdown("""
     .stApp {
         background-color: #F8FAFC;
         font-family: 'Inter', sans-serif;
+    }
+    
+    /* High Contrast Text Readability Global Rules */
+    h1, h2, h3, h4, h5, h6, p, span, label {
+        color: #0F172A !important;  /* Deep Slate Charcoal for Maximum Contrast */
+    }
+    
+    /* Sidebar Specific Contrast Overrides */
+    section[data-testid="stSidebar"] {
+        background-color: #0F172A !important;
+        border-right: 1px solid #1E293B;
+    }
+    section[data-testid="stSidebar"] h2, 
+    section[data-testid="stSidebar"] div, 
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] label {
+        color: #E2E8F0 !important;  /* Crisp Off-White/Light Silver for Dark Sidebar */
     }
     
     /* Clean Professional Login Layout Card */
@@ -65,73 +82,67 @@ st.markdown("""
     .auth-header-main {
         font-size: 26px;
         font-weight: 700;
-        color: #0F172A;
+        color: #0F172A !important;
         text-align: center;
         letter-spacing: -0.5px;
     }
     .auth-header-sub {
         font-size: 13px;
-        color: #64748B;
+        color: #64748B !important;
         text-align: center;
         margin-top: 6px;
         margin-bottom: 25px;
     }
     
-    /* Corporate Dashboard Navigation Menu */
-    section[data-testid="stSidebar"] {
-        background-color: #0F172A !important;
-        border-right: 1px solid #1E293B;
-    }
-    section[data-testid="stSidebar"] * {
-        color: #94A3B8 !important;
-    }
-    
-    /* Clean Form Layout Cards */
+    /* Clean Grid Cards and Form Layout Elements */
     .panel-card-container {
         background: #FFFFFF;
         padding: 25px;
-        border-radius: 8px;
+        border-radius: 10px;
         border: 1px solid #E2E8F0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.01);
         margin-bottom: 20px;
     }
     
-    /* Text Typography Controls */
+    /* Structural Section Typography Layouts */
     .main-title-view {
         font-size: 28px;
         font-weight: 700;
-        color: #0F172A;
+        color: #0F172A !important;
         letter-spacing: -0.5px;
+        margin-bottom: 2px;
     }
     .sub-title-view {
         font-size: 14px;
-        color: #64748B;
+        color: #64748B !important;
         margin-bottom: 25px;
     }
     
-    /* High-End Metric Card Nodes */
+    /* High-End Clean Metric Layout Structures */
     .metric-node-box {
         background: #FFFFFF;
-        padding: 22px;
+        padding: 24px;
         border-radius: 8px;
         border: 1px solid #E2E8F0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
     .metric-node-label {
         font-size: 11px;
         font-weight: 600;
-        color: #64748B;
+        color: #64748B !important;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
     .metric-node-value {
-        font-size: 26px;
+        font-size: 28px;
         font-weight: 700;
-        color: #0F172A;
-        margin-top: 4px;
+        color: #0F172A !important;
+        margin-top: 6px;
     }
     
-    /* Unified Structural Professional Button Overrides */
+    /* Structured Button Platform Overrides */
     .stButton>button {
-        background-color: #0F766E !important;
+        background-color: #0F766E !important; /* Premium Dark Teal */
         color: #FFFFFF !important;
         border-radius: 6px !important;
         padding: 10px 24px !important;
@@ -143,19 +154,23 @@ st.markdown("""
     .stButton>button:hover {
         background-color: #115E59 !important;
     }
+    
+    /* Input Labels Readability Fix */
+    div[data-testid="stWidgetLabel"] p {
+        color: #334155 !important;
+        font-weight: 500 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ================= FUNCTIONAL AUTHENTICATION FLOW =================
 if not st.session_state.logged_in:
-    # Sidebar ko block kar dein jab tak login complete nahi hota
     st.markdown("""<style>section[data-testid="stSidebar"] {display: none !important;}</style>""", unsafe_allow_html=True)
-    
     st.markdown("<br><br>", unsafe_allow_html=True)
     gutter_left, center_auth, gutter_right = st.columns([1.1, 1.2, 1.1])
     
     with center_auth:
-        # MODULE A: SIGN IN FORM
+        # SIGN IN COMPONENT
         if st.session_state.auth_screen == "login":
             st.markdown("""
                 <div class='auth-container-box'>
@@ -169,10 +184,8 @@ if not st.session_state.logged_in:
             
             st.markdown("<br>", unsafe_allow_html=True)
             if st.button("Sign In to System", use_container_width=True):
-                # Proper clean database value checking
                 if login_user in st.session_state.auth_registry and st.session_state.auth_registry[login_user] == login_pass:
                     st.session_state.logged_in = True
-                    st.success("Session verified.")
                     st.rerun()
                 else:
                     st.error("Access denied. Invalid credentials parameter.")
@@ -182,7 +195,7 @@ if not st.session_state.logged_in:
                 st.session_state.auth_screen = "register"
                 st.rerun()
                 
-        # MODULE B: SIGN UP FORM
+        # SIGN UP COMPONENT
         elif st.session_state.auth_screen == "register":
             st.markdown("""
                 <div class='auth-container-box'>
@@ -204,7 +217,6 @@ if not st.session_state.logged_in:
                 elif reg_pass != reg_conf:
                     st.error("Configurations mismatch. Passwords must be perfectly equivalent.")
                 else:
-                    # Sync to application memory database array
                     st.session_state.auth_registry[reg_user] = reg_pass
                     st.success("Registration complete! You can now sign in using these keys.")
                     st.session_state.auth_screen = "login"
@@ -220,7 +232,7 @@ if not st.session_state.logged_in:
 st.sidebar.markdown("""
 <div style='padding: 20px 8px 10px 8px;'>
     <div style='color: #F8FAFC; font-weight: 700; font-size:22px; letter-spacing:-0.5px;'>DiabetesCare AI</div>
-    <div style='color: #64748B; font-size: 12px; margin-top: 2px; font-weight:500;'>Clinical Management Architecture</div>
+    <div style='color: #94A3B8; font-size: 12px; margin-top: 2px; font-weight:500;'>Clinical Management Architecture</div>
 </div>
 <hr style='border-color: #1E293B; margin-top: 0px; margin-bottom:15px;'>
 """, unsafe_allow_html=True)
@@ -236,7 +248,7 @@ if st.sidebar.button("Log Out System Workspace", use_container_width=True):
     st.session_state.auth_screen = "login"
     st.rerun()
 
-# ================= DASHBOARD OVERVIEW =================
+# ================= MENU 1: DASHBOARD OVERVIEW =================
 if menu == "Dashboard Overview":
     st.markdown('<div class="main-title-view">System Dashboard</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title-view">Overview of current registered clinical database records</div>', unsafe_allow_html=True)
@@ -253,21 +265,39 @@ if menu == "Dashboard Overview":
     with c4: st.markdown(f'<div class="metric-node-box" style="border-top: 4px solid #0D9488;"><div class="metric-node-label">Normal Physiological Status</div><div class="metric-node-value">{normal}</div></div>', unsafe_allow_html=True)
         
     st.write("<br>", unsafe_allow_html=True)
-    col1, col2 = st.columns([1.6, 1])
+    col1, col2 = st.columns([1.5, 1])
+    
     with col1:
-        st.markdown("#### Recent Case Profiles Integrated")
+        st.markdown("##### Recent Integrated Case Records")
         if st.session_state.patients:
             df = pd.DataFrame(st.session_state.patients).fillna("N/A")
-            st.dataframe(df[["ID", "Name", "Age", "Gender", "Stage"]], use_container_width=True, hide_index=True)
+            st.dataframe(
+                df[["ID", "Name", "Age", "Gender", "Stage"]], 
+                use_container_width=True, 
+                hide_index=True
+            )
         else:
-            st.info("No cases currently recorded within institutional structures.")
+            st.info("No cases currently recorded within storage frameworks.")
+            
     with col2:
-        st.markdown("#### Demographic Ratio Metrics")
-        fig = go.Figure(data=[go.Pie(labels=["Diabetes State", "Normal State", "Prediabetes State"], values=[positive, normal, risk], hole=.65, marker=dict(colors=['#DC2626', '#0D9488', '#D97706']))])
-        fig.update_layout(height=260, margin=dict(l=10, r=10, t=10, b=10), showlegend=True, paper_bgcolor="white")
+        st.markdown("##### Population Density Proportions")
+        fig = go.Figure(data=[go.Pie(
+            labels=["Diabetes Mellitus", "Normal Status", "Prediabetes Risk"], 
+            values=[positive, normal, risk], 
+            hole=.60, 
+            marker=dict(colors=['#DC2626', '#0D9488', '#D97706']),
+            textinfo='percent'
+        )])
+        fig.update_layout(
+            height=280, 
+            margin=dict(l=10, r=10, t=10, b=10), 
+            showlegend=True, 
+            paper_bgcolor="rgba(0,0,0,0)",
+            legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5)
+        )
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
-# ================= DIAGNOSTIC PIPELINE =================
+# ================= MENU 2: DIAGNOSTIC PIPELINE =================
 elif menu == "Diagnostic Pipeline":
     if "step" not in st.session_state:
         st.session_state.step = 1
@@ -279,15 +309,15 @@ elif menu == "Diagnostic Pipeline":
         st.markdown("<div class='panel-card-container'><h5>Phase 1: Entry Demographics & Direct Laboratory Glycemic Markers</h5><br>", unsafe_allow_html=True)
         l, r = st.columns(2)
         with l:
-            name = st.text_input("Patient Full Identity Name Sequence", placeholder="Enter clinical patient text data name")
-            age = st.number_input("Patient Age Value", min_value=1, max_value=120, value=35)
+            name = st.text_input("Patient Full Identity Name Sequence", placeholder="Enter legal text name string")
+            age = st.number_input("Patient Biological Age Value", min_value=1, max_value=120, value=35)
             gender = st.selectbox("Biological Sex Taxonomy Configuration", ["Male", "Female"])
             bmi = st.number_input("Calculated Body Mass Index (BMI Value Ratio)", min_value=10.0, max_value=60.0, value=24.5)
         with r:
             fbs = st.number_input("Fasting Blood Sugar Volume (FBS) [mg/dL]", min_value=50.0, max_value=400.0, value=100.0)
             hba1c = st.number_input("Laboratory Glycated Hemoglobin (HbA1c Count Percent %)", min_value=3.0, max_value=15.0, value=5.8)
             gtt = st.number_input("2-Hour Postprandial Glucose Tolerance Validation (GTT) [mg/dL]", min_value=50.0, max_value=500.0, value=130.0)
-            contact = st.text_input("Core Contact Mapping Value Sequence", placeholder="Enter numeric string digits")
+            contact = st.text_input("Core Contact Mapping Value Sequence", placeholder="Enter numeric contact digits")
         st.markdown("</div>", unsafe_allow_html=True)
         
         if st.button("Process Initial Metrics Framework"):
@@ -355,13 +385,13 @@ elif menu == "Diagnostic Pipeline":
         p = st.session_state.patient_data
         
         st.markdown(f"""
-            <div style="background-color: #F8FAFC; padding: 22px; border-radius: 6px; border: 1px solid #E2E8F0;">
-                <h5 style="color: #0F766E; margin-top: 0; font-weight:700;">Diagnostic Engine Analytics Evaluation Result</h5>
+            <div style="background-color: #FFFFFF; padding: 22px; border-radius: 6px; border: 1px solid #E2E8F0;">
+                <h5 style="color: #0F766E !important; margin-top: 0; font-weight:700;">Diagnostic Engine Analytics Evaluation Result</h5>
                 <hr style="margin: 12px 0; border-color:#E2E8F0;">
-                <p style="margin: 4px 0; font-size:14px;"><b>Identity Label Reference:</b> {p.get('Name')}</p>
-                <p style="margin: 4px 0; font-size:14px;"><b>Physiological Vectors:</b> {p.get('Age')} Years | {p.get('Gender')}</p>
-                <p style="margin: 4px 0; font-size:14px;"><b>Glycemic Level State Map:</b> <span style="color: #DC2626; font-weight: 700;">{p.get('Stage')}</span></p>
-                <p style="margin: 4px 0; font-size:14px;"><b>Isolated Secondary Strain Subtype:</b> {p.get('Type', 'N/A')}</p>
+                <p style="margin: 6px 0; font-size:14px; color:#1E293B !important;"><b>Identity Label Reference:</b> {p.get('Name')}</p>
+                <p style="margin: 6px 0; font-size:14px; color:#1E293B !important;"><b>Physiological Vectors:</b> {p.get('Age')} Years | {p.get('Gender')}</p>
+                <p style="margin: 6px 0; font-size:14px; color:#1E293B !important;"><b>Glycemic Level State Map:</b> <span style="color: #DC2626 !important; font-weight: 700;">{p.get('Stage')}</span></p>
+                <p style="margin: 6px 0; font-size:14px; color:#1E293B !important;"><b>Isolated Secondary Strain Subtype:</b> {p.get('Type', 'N/A')}</p>
             </div>
         """, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -380,7 +410,7 @@ elif menu == "Diagnostic Pipeline":
             st.session_state.patient_data = {}
             st.rerun()
 
-# ================= PATIENTS MATRIX REGISTRY =================
+# ================= MENU 3: PATIENTS MATRIX REGISTRY =================
 elif menu == "Patients Matrix Registry":
     st.markdown('<div class="main-title-view">Electronic Health Ledger Database</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title-view">Registry control layers and transactional data table frames</div>', unsafe_allow_html=True)
@@ -391,10 +421,14 @@ elif menu == "Patients Matrix Registry":
         if search:
             df = df[df["Name"].str.contains(search, case=False, na=False)]
             
-        st.dataframe(df[["ID", "Name", "Age", "Gender", "Contact", "Stage", "Type"]], use_container_width=True, hide_index=True)
+        st.dataframe(
+            df[["ID", "Name", "Age", "Gender", "Contact", "Stage", "Type"]], 
+            use_container_width=True, 
+            hide_index=True
+        )
         
         st.write("<br><br>", unsafe_allow_html=True)
-        st.markdown("##### Administrative Operations Node Controller")
+        st.markdown("<div class='panel-card-container'><h5>Administrative System Modification Module</h5>", unsafe_allow_html=True)
         del_target = st.text_input("Target Row Unique ID Reference Sequence to Drop (e.g. P1)", placeholder="Enter row identity mapping sequence...")
         if st.button("Purge Database Entity Frame"):
             if del_target:
@@ -402,21 +436,25 @@ elif menu == "Patients Matrix Registry":
                 st.session_state.patients = get_patients()
                 st.success(f"Row allocation {del_target} successfully unlinked from data architecture.")
                 st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info("No compiled metrics logged inside storage records matrix lines.")
 
-# ================= DATA REPORT CENTER =================
+# ================= MENU 4: DATA REPORT CENTER =================
 elif menu == "Data Report Center":
     st.markdown('<div class="main-title-view">Documentation Export Matrices</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title-view">Download formal plain-text electronic verification logs</div>', unsafe_allow_html=True)
     
     if st.session_state.patients:
+        df_rep = pd.DataFrame(st.session_state.patients).fillna("N/A")
         st.markdown("<div class='panel-card-container'>", unsafe_allow_html=True)
-        for idx, row in pd.DataFrame(st.session_state.patients).iterrows():
+        
+        # Display as highly polished layout rows
+        for idx, row in df_rep.iterrows():
             c = st.columns([1, 3, 2, 2])
-            c[0].write(f"**{row.get('ID', 'P')}**")
-            c[1].write(row.get("Name"))
-            c[2].write(row.get("Stage"))
+            c[0].markdown(f"<span style='color:#475569; font-weight:600;'>{row.get('ID')}</span>", unsafe_allow_html=True)
+            c[1].markdown(f"<span style='color:#0F172A; font-weight:500;'>{row.get('Name')}</span>", unsafe_allow_html=True)
+            c[2].markdown(f"<span style='color:#0F766E;'>{row.get('Stage')}</span>", unsafe_allow_html=True)
             
             report_body = f"DIABETESCARE AI DIAGNOSTIC REPORT\n=================================\nID: {row.get('ID')}\nPatient Name: {row.get('Name')}\nDiagnosis Stage: {row.get('Stage')}\nClassification Sub-type: {row.get('Type', 'N/A')}\nTimestamp: {datetime.now().strftime('%Y-%m-%d')}"
             c[3].download_button("Export Plain Text Log", data=report_body, file_name=f"EHR_Report_{row.get('Name')}.txt", key=f"btn_{idx}")
@@ -424,7 +462,7 @@ elif menu == "Data Report Center":
     else:
         st.info("No file object generation arrays detected in data nodes.")
 
-# ================= VISUAL ANALYTICS NODE =================
+# ================= MENU 5: VISUAL ANALYTICS NODE =================
 elif menu == "Visual Analytics Node":
     st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title-view">Epidemiological variable mapping layouts</div>', unsafe_allow_html=True)
@@ -432,22 +470,45 @@ elif menu == "Visual Analytics Node":
     if st.session_state.patients:
         df = pd.DataFrame(st.session_state.patients)
         l, r = st.columns(2)
+        
         with l:
-            st.write("###### Fasting Blood Sugar (FBS) vs Patient Age Distribution Graph")
-            fig1 = px.scatter(df, x="Age", y="FBS", color="Stage", color_discrete_sequence=['#DC2626', '#0D9488', '#D97706'], template="simple_white")
-            fig1.update_layout(paper_bgcolor="white")
+            st.markdown("<div class='panel-card-container'><h6>Fasting Blood Sugar (FBS) vs Patient Age Distribution</h6>", unsafe_allow_html=True)
+            fig1 = px.scatter(
+                df, x="Age", y="FBS", color="Stage",
+                color_discrete_map={'Diabetes Mellitus': '#DC2626', 'Normal': '#0D9488', 'Prediabetes': '#D97706'},
+                template="simple_white"
+            )
+            fig1.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                margin=dict(l=20, r=20, t=20, b=20),
+                font=dict(family="Inter", size=12, color="#1E293B")
+            )
             st.plotly_chart(fig1, use_container_width=True, config={'displayModeBar': False})
+            st.markdown("</div>", unsafe_allow_html=True)
+            
         with r:
-            st.write("###### Sex Categorization Matrix Breakdown Proportions")
+            st.markdown("<div class='panel-card-container'><h6>Sex Categorization Breakdown Vector</h6>", unsafe_allow_html=True)
             m_size = len(df[df["Gender"] == "Male"])
             f_size = len(df[df["Gender"] == "Female"])
-            fig2 = go.Figure(data=[go.Pie(labels=["Male Proportions Cluster", "Female Proportions Cluster"], values=[m_size, f_size], hole=0.58, marker=dict(colors=['#0F766E','#BE123C']))])
-            fig2.update_layout(margin=dict(t=10,b=10,l=10,r=10), paper_bgcolor="white")
+            fig2 = go.Figure(data=[go.Pie(
+                labels=["Male Configuration", "Female Configuration"], 
+                values=[m_size, f_size], 
+                hole=0.55, 
+                marker=dict(colors=['#0F766E','#BE123C']),
+                textinfo='value'
+            )])
+            fig2.update_layout(
+                margin=dict(t=20, b=20, l=20, r=20), 
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter", size=12, color="#1E293B"),
+                legend=dict(orientation="h", yanchor="bottom", y=-0.15, xanchor="center", x=0.5)
+            )
             st.plotly_chart(fig2, use_container_width=True, config={'displayModeBar': False})
+            st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.info("Laboratory graphs are frozen until system values populate memory arrays.")
 
-# ================= CONSULTATION MATRIX =================
+# ================= MENU 6: CONSULTATION MATRIX =================
 elif menu == "Consultation Matrix":
     st.markdown('<div class="main-title-view">Clinical Allocation Matrix Grid</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title-view">Time logs tracking operational consultation scheduling blocks</div>', unsafe_allow_html=True)
@@ -458,6 +519,9 @@ elif menu == "Consultation Matrix":
         "Target Allocation Time Window": ["18 May - 10:00 AM", "19 May - 11:30 AM", "20 May - 02:00 PM"],
         "Current Verification Pipeline Flags": ["Confirmed Structure Log", "In Review Validation Queue", "Confirmed Structure Log"]
     })
-    st.markdown("<div class='panel-card-container'>", unsafe_allow_html=True)
-    st.dataframe(sche_df, use_container_width=True, hide_index=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    
+    st.dataframe(
+        sche_df, 
+        use_container_width=True, 
+        hide_index=True
+    )
