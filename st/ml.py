@@ -70,7 +70,9 @@ st.markdown("""
     .stButton data-shortcut, 
     button p span,
     button[data-testid="baseButton-secondary"] span,
-    div[data-testid="stWidgetLabel"] + div p {
+    div[data-testid="stWidgetLabel"] + div p,
+    div[data-testid="stTooltipHoverTarget"],
+    div[data-testid="stTooltipContent"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -241,6 +243,11 @@ st.markdown("""
         justify-content: center !important;
     }
     
+    /* FORCE REMOVAL OF ANY NATIVE TOOLTIP TEXT ON HOVER */
+    .custom-collapse-wrapper button:hover {
+        color: #38BDF8 !important;
+    }
+
     /* Sidebar Lower Spacing Grid Configuration to clear absolute boundary lines */
     .sidebar-bottom-panel-padded {
         padding: 10px 12px 15px 12px !important;
@@ -346,19 +353,19 @@ if st.session_state.sidebar_collapsed:
         </style>
     """, unsafe_allow_html=True)
 else:
-    # UPPER TITLE HEADER ROW LAYOUT FOR EXACT CORNER CLOSE POSITION
-    side_head_left, side_head_right = st.sidebar.columns([4.0, 1.0])
+    # 1. FIXED POSITION: Moved the collapse button column alignment to shift it upwards near the header baseline
+    side_head_left, side_head_right = st.sidebar.columns([3.8, 1.2])
     with side_head_left:
         st.markdown("""
-        <div style='padding-top: 2px;'>
-            <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px;'>DiabetesCare AI</div>
-            <div style='color: #38BDF8; font-size: 10px; margin-top: 2px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
+        <div style='padding-top: 0px;'>
+            <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.75px; line-height: 1.1;'>DiabetesCare AI</div>
+            <div style='color: #38BDF8; font-size: 10px; margin-top: 4px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
         </div>
         """, unsafe_allow_html=True)
         
     with side_head_right:
-        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 4px; text-align: right;'>", unsafe_allow_html=True)
-        if st.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: -6px; text-align: right;'>", unsafe_allow_html=True)
+        if st.button("«", key="trigger_sidebar_collapse"):
             st.session_state.sidebar_collapsed = True
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
@@ -389,13 +396,13 @@ else:
     st.session_state.current_menu_node = menu
 
 # ================= CORE VIEW CONTENT REGISTRATION =================
-# FIXED POSITION: Header matching top native structure level exactly
+# 2. FIXED POSITION: Upper margin adjustment to elevate expansion arrow alignment level
 layout_header_left, layout_header_right = st.columns([0.4, 11.6])
 
 with layout_header_left:
     if st.session_state.sidebar_collapsed:
-        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 6px;'>", unsafe_allow_html=True)
-        if st.button("»", key="trigger_sidebar_expand", help="Show Side Menu Options"):
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: -12px;'>", unsafe_allow_html=True)
+        if st.button("»", key="trigger_sidebar_expand"):
             st.session_state.sidebar_collapsed = False
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
@@ -404,7 +411,7 @@ with layout_header_left:
 
 with layout_header_right:
     if menu == "Dashboard Overview":
-        st.markdown('<div class="main-title-view">System Executive Dashboard</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-title-view" style="margin-top: -15px;">System Executive Dashboard</div>', unsafe_allow_html=True)
         st.markdown('<div class="sub-title-view">Live Operational Monitoring & Clinical Summary Matrices</div>', unsafe_allow_html=True)
 
 # View router execution path layers
@@ -475,7 +482,7 @@ elif menu == "Diagnostic Pipeline":
         st.session_state.step = 1
     
     with layout_header_right:
-        st.markdown('<div class="main-title-view">AI Inference Architecture</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-title-view" style="margin-top: -15px;">AI Inference Architecture</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="sub-title-view">Multi-stage analytics system pipeline — <b>Active Phase Frame {st.session_state.step} of 3</b></div>', unsafe_allow_html=True)
     
     if st.session_state.step == 1:
@@ -586,7 +593,7 @@ elif menu == "Diagnostic Pipeline":
 # ================= MODULE 3: PATIENTS MATRIX REGISTRY =================
 elif menu == "Patients Matrix Registry":
     with layout_header_right:
-        st.markdown('<div class="main-title-view">Electronic Health Ledger Database</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-title-view" style="margin-top: -15px;">Electronic Health Ledger Database</div>', unsafe_allow_html=True)
         st.markdown('<div class="sub-title-view">Registry control layers and transactional data table frames</div>', unsafe_allow_html=True)
     
     if st.session_state.patients:
@@ -617,7 +624,7 @@ elif menu == "Patients Matrix Registry":
 # ================= MODULE 4: DATA REPORT CENTER =================
 elif menu == "Data Report Center":
     with layout_header_right:
-        st.markdown('<div class="main-title-view">Documentation Export Matrices</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-title-view" style="margin-top: -15px;">Documentation Export Matrices</div>', unsafe_allow_html=True)
         st.markdown('<div class="sub-title-view">Download formal plain-text electronic verification logs</div>', unsafe_allow_html=True)
     
     if st.session_state.patients:
@@ -639,7 +646,7 @@ elif menu == "Data Report Center":
 # ================= MODULE 5: VISUAL ANALYTICS NODE =================
 elif menu == "Visual Analytics Node":
     with layout_header_right:
-        st.markdown('<div class="main-title-view">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-title-view" style="margin-top: -15px;">Statistical Laboratory Analytics</div>', unsafe_allow_html=True)
         st.markdown('<div class="sub-title-view">Advanced Epidemiological Variable Mapping Layouts</div>', unsafe_allow_html=True)
 
     if not st.session_state.patients:
@@ -756,7 +763,7 @@ elif menu == "Visual Analytics Node":
 # ================= MODULE 6: CONSULTATION MATRIX =================
 elif menu == "Consultation Matrix":
     with layout_header_right:
-        st.markdown('<div class="main-title-view">Clinical Allocation Matrix Grid</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-title-view" style="margin-top: -15px;">Clinical Allocation Matrix Grid</div>', unsafe_allow_html=True)
         st.markdown('<div class="sub-title-view">Time logs tracking operational consultation scheduling blocks</div>', unsafe_allow_html=True)
     
     sche_df = pd.DataFrame({
