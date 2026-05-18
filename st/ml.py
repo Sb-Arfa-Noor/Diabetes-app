@@ -348,24 +348,24 @@ else:
         st.rerun()
     st.sidebar.markdown("</div>", unsafe_allow_html=True)
 
-    # 2. Phr heading aur heading ke neeche wali line
+    # 2. Heading aur heading ke neeche single line mein blue sub-heading text
     st.sidebar.markdown("""
     <div style='padding-top: 15px; padding-left: 2px; white-space: nowrap;'>
         <div style='color: #FFFFFF; font-weight: 800; font-size:22px; letter-spacing:-0.5px;'>DiabetesCare AI</div>
-        <div style='color: #38BDF8; font-size: 10px; margin-top: 3px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
+        <div style='color: #38BDF8; font-size: 11px; margin-top: 4px; font-weight:700; text-transform: uppercase; letter-spacing:0.8px; white-space: nowrap;'>Clinical Neural Center</div>
     </div>
     """, unsafe_allow_html=True)
 
     st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 15px; margin-bottom:5px;'>", unsafe_allow_html=True)
 
-    # 3. Phr saare navigation menu options thode gap ke sath
+    # 3. Saare navigation menu options
     menu = st.sidebar.radio(
         "NAVIGATION NODE",
         ["Dashboard Overview", "Patients Matrix Registry", "Diagnostic Pipeline", "Data Report Center", "Visual Analytics Node", "Consultation Matrix"],
         label_visibility="collapsed"
     )
 
-    # 4. End mein terminate wala button proper spacing pe
+    # 4. End mein terminate wala button
     st.sidebar.markdown("<div class='sidebar-bottom-panel-padded'>", unsafe_allow_html=True)
     st.sidebar.markdown("<hr style='border-color: #1E293B; margin-bottom: 16px;'>", unsafe_allow_html=True)
     if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
@@ -418,7 +418,7 @@ if menu == "Dashboard Overview":
         
     st.write("<br>", unsafe_allow_html=True)
     
-    # Grid ratio tweaked to give the Pie Chart ample space without breaking or cutting off
+    # Grid layout adjusted for beautiful large chart view
     col1, col2 = st.columns([1.2, 1.2])
     
     with col1:
@@ -440,7 +440,7 @@ if menu == "Dashboard Overview":
             st.dataframe(mock_table, use_container_width=True, hide_index=True)
             
     with col2:
-        st.markdown("<div class='panel-card-container' style='min-height: 380px;'>", unsafe_allow_html=True)
+        # Extra top container block completely removed. Title and Chart render directly.
         st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700; font-size:15px;'>Population Density Proportions</h5>", unsafe_allow_html=True)
         
         fig = go.Figure()
@@ -450,29 +450,28 @@ if menu == "Dashboard Overview":
             hole=0.55, 
             marker=dict(
                 colors=['#F43F5E', '#10B981', '#F59E0B'],
-                line=dict(color='#111C44', width=2)
+                line=dict(color='#0B0F19', width=2)
             ),
             textinfo='percent',
             hoverinfo='label+value+percent'
         ))
         
         fig.update_layout(
-            height=260, 
-            margin=dict(l=20, r=20, t=10, b=10), 
+            height=340, # Perfect large size for proper visibility
+            margin=dict(l=10, r=10, t=10, b=10), 
             showlegend=True, 
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
-                y=-0.3,
+                y=-0.15,
                 xanchor="center",
                 x=0.5,
-                font=dict(size=11, color="#94A3B8")
+                font=dict(size=12, color="#94A3B8")
             ),
             paper_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Plus Jakarta Sans", color="#FFFFFF")
         )
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-        st.markdown("</div>", unsafe_allow_html=True)
 
 # ================= MODULE 2: DIAGNOSTIC PIPELINE =================
 elif menu == "Diagnostic Pipeline":
