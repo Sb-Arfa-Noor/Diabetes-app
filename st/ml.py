@@ -60,39 +60,22 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
     
-    /* Hide Streamlit's Native Built-in Sidebar Buttons completely */
+    /* Completely hide Streamlit's native sidebar collapse button to gain full structural control */
+    [data-testid="stSidebarCollapseButton"] {
+        display: none !important;
+    }
     button[data-testid="sidebar-toggle-button"] {
         display: none !important;
     }
 
-    /* THE ULTIMATE ANNIHILATION OF KEYBOARD_DOUBLE_ARROW GLITCH TEXT */
-    /* This completely zero-sizes and vaporizes all hidden native text or material icons */
-    section[data-testid="stSidebar"] button span,
-    section[data-testid="stSidebar"] button p,
-    section[data-testid="stSidebar"] data-shortcut,
-    span[data-testid="stWidgetHint"],
-    .custom-collapse-wrapper button span,
-    .custom-collapse-wrapper button p,
-    button[data-testid="baseButton-secondary"] p,
-    button[data-testid="baseButton-secondary"] span {
+    /* Target utility hints carefully without blinding custom raw string metrics or explicit icons */
+    span[data-testid="stWidgetHint"], 
+    .stButton data-shortcut {
         display: none !important;
-        font-size: 0px !important;
-        color: transparent !important;
-        line-height: 0 !important;
         visibility: hidden !important;
         opacity: 0 !important;
-        width: 0px !important;
-        height: 0px !important;
     }
     
-    /* Absolute target block override to ensure text never displays inside wrapper buttons */
-    .custom-collapse-wrapper button {
-        color: #38BDF8 !important;
-        font-size: 16px !important;
-        font-weight: bold !important;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
-    }
-
     /* Main Streamlit Core Overrides */
     div[data-testid="stWidgetLabel"] p {
         color: #94A3B8 !important;
@@ -109,19 +92,12 @@ st.markdown("""
         padding: 8px 12px !important;
     }
     
-    /* ABSOLUTE REMOVAL OF SCROLLBARS AND CONTENT CLIPPING FROM SIDEBAR */
+    /* REMOVAL OF SCROLLBARS FROM THE SIDE MENU CONTAINER */
     section[data-testid="stSidebar"] {
         background-color: #090D16 !important;
         border-right: 1px solid #1E293B !important;
-        padding: 12px 14px !important;
+        padding: 10px 14px !important;
         overflow: hidden !important;
-    }
-    
-    section[data-testid="stSidebar"]::-webkit-scrollbar,
-    section[data-testid="stSidebar"] *::-webkit-scrollbar {
-        display: none !important;
-        width: 0px !important;
-        height: 0px !important;
     }
     
     section[data-testid="stSidebar"] div, 
@@ -215,20 +191,6 @@ st.markdown("""
         border: 1px solid #1E293B;
         margin-top: 40px;
     }
-    .auth-header-main {
-        font-size: 28px;
-        font-weight: 800;
-        color: #FFFFFF !important;
-        text-align: center;
-        letter-spacing: -0.5px;
-    }
-    .auth-header-sub {
-        font-size: 13px;
-        color: #94A3B8 !important;
-        text-align: center;
-        margin-top: 8px;
-        margin-bottom: 30px;
-    }
     
     /* Custom High Contrast Core System Buttons */
     .stButton>button {
@@ -247,26 +209,36 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35) !important;
     }
     
-    /* PRECISE ALIGNMENT FOR THE EXPAND / COLLAPSE CUSTOM ARROWS AS PER IMAGE */
+    /* PRECISE FIXED ALIGNMENT FOR FORCE-VISIBLE CUSTOM TOGGLE ARROWS */
     .custom-collapse-wrapper button {
-        background: #111827 !important;
-        border: 1px solid #1E293B !important;
-        color: #38BDF8 !important;
-        font-size: 16px !important;
+        background: #38BDF8 !important;
+        border: 1px solid #0284C7 !important;
+        color: #090D16 !important;
+        font-size: 18px !important;
+        font-weight: 900 !important;
         padding: 0px !important;
         border-radius: 6px !important;
-        min-width: 36px !important;
-        width: 36px !important;
-        height: 36px !important;
+        min-width: 38px !important;
+        width: 38px !important;
+        height: 38px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        box-shadow: 0 0 12px rgba(56,189,248, 0.4) !important;
+    }
+    .custom-collapse-wrapper button p, .custom-collapse-wrapper button span {
+        color: #090D16 !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 18px !important;
+        font-weight: 900 !important;
     }
     
-    /* Sidebar Lower Spacing Grid Configuration to clear absolute boundary lines */
+    /* Sidebar Lower Spacing Grid Configuration */
     .sidebar-bottom-panel-padded {
         padding: 10px 12px 15px 12px !important;
-        margin-top: 15px;
+        margin-top: 25px;
     }
 
     div[data-testid="stDataFrame"] {
@@ -284,9 +256,6 @@ st.markdown("""
         font-size: 13px;
         line-height: 1.6;
     }
-    .custom-report-view h4, .custom-report-view h5, .custom-report-view p, .custom-report-view b {
-        color: #1E293B !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -300,8 +269,8 @@ if not st.session_state.logged_in:
         if st.session_state.auth_screen == "login":
             st.markdown("""
                 <div class='auth-container-box'>
-                    <div class='auth-header-main'>Clinical Portal Access</div>
-                    <div class='auth-header-sub'>Secure Administrative Dashboard Identity Validation Keys</div>
+                    <div style='font-size: 28px; font-weight: 800; color: #FFFFFF !important; text-align: center; letter-spacing: -0.5px;'>Clinical Portal Access</div>
+                    <div style='font-size: 13px; color: #94A3B8 !important; text-align: center; margin-top: 8px; margin-bottom: 30px;'>Secure Administrative Dashboard Identity Validation Keys</div>
                 </div>
             """, unsafe_allow_html=True)
             
@@ -324,8 +293,8 @@ if not st.session_state.logged_in:
         elif st.session_state.auth_screen == "register":
             st.markdown("""
                 <div class='auth-container-box'>
-                    <div class='auth-header-main'>Register Practitioner</div>
-                    <div class='auth-header-sub'>Structure new active clinical access parameters into secure framework</div>
+                    <div style='font-size: 28px; font-weight: 800; color: #FFFFFF !important; text-align: center; letter-spacing: -0.5px;'>Register Practitioner</div>
+                    <div style='font-size: 13px; color: #94A3B8 !important; text-align: center; margin-top: 8px; margin-bottom: 30px;'>Structure new active clinical access parameters into secure framework</div>
                 </div>
             """, unsafe_allow_html=True)
             
@@ -368,24 +337,24 @@ if st.session_state.sidebar_collapsed:
         </style>
     """, unsafe_allow_html=True)
 else:
-    # 1. TOP POSITIONED BUTTON LAYOUT
-    side_top_left, side_top_right = st.sidebar.columns([4.0, 1.0])
-    with side_top_left:
-        st.write("") # Gap buffer
-    with side_top_right:
-        st.markdown("<div class='custom-collapse-wrapper' style='text-align: right; margin-bottom: 5px;'>", unsafe_allow_html=True)
-        if st.sidebar.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
+    # 75/25 split layout ensuring ample room for title text without line wrap breaks
+    side_head_left, side_head_right = st.sidebar.columns([3.0, 1.0])
+    with side_head_left:
+        st.markdown("""
+        <div style='padding-top: 2px; white-space: nowrap;'>
+            <div style='color: #FFFFFF; font-weight: 800; font-size:20px; letter-spacing:-0.5px;'>DiabetesCare AI</div>
+            <div style='color: #38BDF8; font-size: 10px; margin-top: 1px; font-weight:700; text-transform: uppercase; letter-spacing:1px;'>Clinical Neural Center</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with side_head_right:
+        st.markdown("<div class='custom-collapse-wrapper' style='margin-top: 2px; display: flex; justify-content: flex-end;'>", unsafe_allow_html=True)
+        if st.button("«", key="trigger_sidebar_collapse", help="Hide Side Menu Options"):
             st.session_state.sidebar_collapsed = True
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # 2. FIXED HEADERS EXACTLY BELOW THE BUTTON WITH WHITE AND BLUE COLOR MATCH
-    st.sidebar.markdown("""
-    <div style='padding: 0px 4px; margin-bottom: 25px;'>
-        <div style='color: #FFFFFF !important; font-weight: 800; font-size: 24px; letter-spacing: -0.5px; line-height: 1.2;'>DiabetesCare AI</div>
-        <div style='color: #38BDF8 !important; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px; line-height: 1.1;'>Clinical Neural Center</div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-top: 15px; margin-bottom:15px;'>", unsafe_allow_html=True)
 
     menu = st.sidebar.radio(
         "NAVIGATION NODE",
@@ -393,9 +362,8 @@ else:
         label_visibility="collapsed"
     )
 
-    # Lower Container Space With Protected Distance From Corner Lines
     st.sidebar.markdown("<div class='sidebar-bottom-panel-padded'>", unsafe_allow_html=True)
-    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-bottom: 16px; margin-top: 20px;'>", unsafe_allow_html=True)
+    st.sidebar.markdown("<hr style='border-color: #1E293B; margin-bottom: 16px;'>", unsafe_allow_html=True)
     if st.sidebar.button("Terminate Session Workspace", use_container_width=True):
         st.session_state.logged_in = False
         st.session_state.auth_screen = "login"
@@ -411,7 +379,7 @@ else:
     st.session_state.current_menu_node = menu
 
 # ================= CORE VIEW CONTENT REGISTRATION =================
-layout_header_left, layout_header_right = st.columns([0.4, 11.6])
+layout_header_left, layout_header_right = st.columns([0.5, 11.5])
 
 with layout_header_left:
     if st.session_state.sidebar_collapsed:
@@ -445,7 +413,9 @@ if menu == "Dashboard Overview":
     with c4: st.markdown(f'<div class="metric-node-box" style="border-left: 4px solid #10B981;"><div class="metric-node-label">Normal Physiological</div><div class="metric-node-value">{normal}</div></div>', unsafe_allow_html=True)
         
     st.write("<br>", unsafe_allow_html=True)
-    col1, col2 = st.columns([1.4, 1.1])
+    
+    # 55/45 split giving the pie chart proper padding context to display beautifully
+    col1, col2 = st.columns([1.3, 1.1])
     
     with col1:
         st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Recent Integrated Case Records</h5>", unsafe_allow_html=True)
@@ -466,29 +436,39 @@ if menu == "Dashboard Overview":
             st.dataframe(mock_table, use_container_width=True, hide_index=True)
             
     with col2:
-        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:15px; font-weight:700;'>Population Density Proportions</h5>", unsafe_allow_html=True)
+        st.markdown("<div class='panel-card-container' style='padding: 20px; min-height: 380px;'>", unsafe_allow_html=True)
+        st.markdown("<h5 style='color:#FFFFFF; margin-bottom:5px; font-weight:700; font-size:15px;'>Population Density Proportions</h5>", unsafe_allow_html=True)
         
         fig = go.Figure()
         fig.add_trace(go.Pie(
             labels=["Diabetes Mellitus", "Normal Status", "Prediabetes Risk"], 
             values=[positive, normal, risk], 
-            hole=0.65, 
+            hole=0.60, 
             marker=dict(
                 colors=['#F43F5E', '#10B981', '#F59E0B'],
-                line=dict(color='#111C44', width=2)
+                line=dict(color='#111C44', width=3)
             ),
-            textinfo='percent+label',
+            textinfo='percent',
             hoverinfo='label+value+percent'
         ))
         
         fig.update_layout(
-            height=310, 
-            margin=dict(l=15, r=15, t=10, b=10), 
-            showlegend=False, 
+            height=280, 
+            margin=dict(l=10, r=10, t=10, b=10), 
+            showlegend=True, 
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=-0.2,
+                xanchor="center",
+                x=0.5,
+                font=dict(size=11, color="#94A3B8")
+            ),
             paper_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Plus Jakarta Sans", color="#FFFFFF")
         )
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ================= MODULE 2: DIAGNOSTIC PIPELINE =================
 elif menu == "Diagnostic Pipeline":
